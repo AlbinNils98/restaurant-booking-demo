@@ -1,0 +1,7 @@
+
+type Table {
+  _id: ObjectId!
+  reservations: [ObjectId!]!
+  availableDates: [DateTime!]!
+  size: Int
+}

@@ -1,16 +1,15 @@
 import express, { Request, Response } from "express";
 import dotenv from "dotenv";
-import { Collection, Db, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { createSchema, createYoga } from "graphql-yoga";
 import { typeDefs } from "./schema";
-import { Role, type User } from "./generated/graphql";
+import { Reservation, Restaurant, Role, Table, type User } from "./generated/graphql";
 import { GraphQLContext } from "./graphql/context";
 import { resolvers } from './resolvers';
 import bcrypt from "bcryptjs";
 import { authDirectiveTransformer } from './graphql/directives/authDirective';
 import { getCurrentUser } from './auth/getCurrentUser';
-
-
+import { seedInitialData } from './dbSeed';
 
 dotenv.config();
 
@@ -20,35 +19,23 @@ app.use(express.json());
 const uri = process.env.MONGO_URI as string;
 const dbName = process.env.DB_NAME as string;
 
-let db: Db;
-let userCollection: Collection<User>;
-
 export async function initServer() {
   const client = new MongoClient(uri);
   await client.connect();
-  db = client.db(dbName);
-  userCollection = db.collection<User>("user");
+  const db = client.db(dbName);
+  const userCollection = db.collection<User>("user");
+  const restaurantCollection = db.collection<Restaurant>("restaurant");
+  const tableCollection = db.collection<Table>("table");
+  const reservationCollection = db.collection<Reservation>("reservation");
 
-  const usersCount = await userCollection.countDocuments();
-  if (usersCount === 0) {
-    const passwordHash = await bcrypt.hash("password", 10);
-    const initialUsers: User[] = [
-      { _id: new ObjectId(), name: "Alice", email: "alice@example.com", role: Role.Admin, password: passwordHash },
-      { _id: new ObjectId(), name: "Bob", email: "bob@example.com", role: Role.User, password: passwordHash },
-    ];
-    await userCollection.insertMany(initialUsers);
-    console.log("✅ Inserted initial users");
-  }
+  // Seed initial data
+  // Should be removed in production
+  await seedInitialData(db);
 
   console.log("✅ Connected to MongoDB and initialized collections");
 
-  // simple REST route
   app.get("/", async (_req: Request, res: Response) => {
-    const user = await userCollection.findOne({ name: "Alice" });
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-    res.json(user);
+    res.send("Test")
   });
 
   let schema = createSchema<GraphQLContext>({
@@ -68,6 +55,9 @@ export async function initServer() {
       return {
         db,
         users: userCollection,
+        restaurants: restaurantCollection,
+        tables: tableCollection,
+        reservations: reservationCollection,
         currentUser,
       };
     },
@@ -79,5 +69,3 @@ export async function initServer() {
 
   return app;
 }
-
-export { userCollection };

@@ -1,12 +1,11 @@
 import { MutationResolvers } from "../../generated/graphql";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { userCollection } from '@/server';
 import { GraphQLError } from 'graphql';
 
 export const authResolvers: MutationResolvers = {
-  async signIn(_, { email, password }) {
-    const user = await userCollection.findOne({ email });
+  async signIn(_, { email, password }, { users }) {
+    const user = await users.findOne({ email });
     if (!user) {
       throw new GraphQLError("Invalid credentials");
     }
