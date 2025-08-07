@@ -15,6 +15,7 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  DateTime: { input: Date; output: Date; }
   ObjectId: { input: ObjectId; output: ObjectId; }
 };
 
@@ -54,10 +55,37 @@ export type QueryUserByNameArgs = {
   name: Scalars['String']['input'];
 };
 
+export type Reservation = {
+  __typename?: 'Reservation';
+  _id: Scalars['ObjectId']['output'];
+  arrival: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  restaurant: Scalars['ObjectId']['output'];
+  table: Scalars['ObjectId']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type Restaurant = {
+  __typename?: 'Restaurant';
+  _id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+  tables: Array<Maybe<Scalars['ObjectId']['output']>>;
+};
+
 export enum Role {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type Table = {
+  __typename?: 'Table';
+  _id: Scalars['ObjectId']['output'];
+  availableDates: Array<Maybe<Scalars['DateTime']['output']>>;
+  reservations: Array<Maybe<Scalars['ObjectId']['output']>>;
+  size?: Maybe<Scalars['Int']['output']>;
+};
 
 export type User = {
   __typename?: 'User';
@@ -144,11 +172,16 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   Query: ResolverTypeWrapper<{}>;
+  Reservation: ResolverTypeWrapper<Reservation>;
+  Restaurant: ResolverTypeWrapper<Restaurant>;
   Role: Role;
+  Table: ResolverTypeWrapper<Table>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   User: ResolverTypeWrapper<User>;
   AdditionalEntityFields: AdditionalEntityFields;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
@@ -156,10 +189,15 @@ export type ResolversTypes = {
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  DateTime: Scalars['DateTime']['output'];
   Mutation: {};
   String: Scalars['String']['output'];
   ObjectId: Scalars['ObjectId']['output'];
   Query: {};
+  Reservation: Reservation;
+  Restaurant: Restaurant;
+  Table: Table;
+  Int: Scalars['Int']['output'];
   User: User;
   AdditionalEntityFields: AdditionalEntityFields;
   Boolean: Scalars['Boolean']['output'];
@@ -222,6 +260,10 @@ export type MapDirectiveArgs = {
 
 export type MapDirectiveResolver<Result, Parent, ContextType = any, Args = MapDirectiveArgs> = DirectiveResolverFn<Result, Parent, ContextType, Args>;
 
+export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['DateTime'], any> {
+  name: 'DateTime';
+}
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
@@ -237,6 +279,33 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
 
+export type ReservationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Reservation'] = ResolversParentTypes['Reservation']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  arrival?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  restaurant?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  table?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type RestaurantResolvers<ContextType = any, ParentType extends ResolversParentTypes['Restaurant'] = ResolversParentTypes['Restaurant']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  tables?: Resolver<Array<Maybe<ResolversTypes['ObjectId']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type TableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Table'] = ResolversParentTypes['Table']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  availableDates?: Resolver<Array<Maybe<ResolversTypes['DateTime']>>, ParentType, ContextType>;
+  reservations?: Resolver<Array<Maybe<ResolversTypes['ObjectId']>>, ParentType, ContextType>;
+  size?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type UserResolvers<ContextType = any, ParentType extends ResolversParentTypes['User'] = ResolversParentTypes['User']> = {
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -247,9 +316,13 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 };
 
 export type Resolvers<ContextType = any> = {
+  DateTime?: GraphQLScalarType;
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
   Query?: QueryResolvers<ContextType>;
+  Reservation?: ReservationResolvers<ContextType>;
+  Restaurant?: RestaurantResolvers<ContextType>;
+  Table?: TableResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

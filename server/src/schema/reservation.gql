@@ -1,0 +1,11 @@
+
+type Reservation {
+  _id: ObjectId!
+  restaurant: ObjectId!
+  table: ObjectId!
+  arrival: DateTime!
+  name: String!
+  email: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
