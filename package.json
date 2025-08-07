@@ -1,0 +1,22 @@
+{
+  "name": "restaurant",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "typecheck": "tsc -p server/tsconfig.json --noEmit",
+    "lint-only": "eslint . --ext .js,.ts,.tsx --cache",
+    "lint-quiet": "concurrently \"npm run lint-only --quiet\" \"npm run typecheck\""
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "husky": "^9.1.7"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0",
+    "eslint": "^9.32.0"
+  }
+}

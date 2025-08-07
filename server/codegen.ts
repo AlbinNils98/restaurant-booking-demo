@@ -1,0 +1,27 @@
+
+import type { CodegenConfig } from '@graphql-codegen/cli';
+
+const config: CodegenConfig = {
+  overwrite: true,
+  schema: [
+  "src/schema/scalars.graphql",
+  "src/schema/*.gql"
+],
+  generates: {
+    "src/generated/graphql.ts": {
+      plugins: [
+        "typescript", 
+        "typescript-resolvers", 
+        "typescript-mongodb", 
+        "typescript-document-nodes"
+      ],
+      config: {
+        scalars: {
+          ObjectId: "ObjectId",
+        }
+      }
+    },
+  }
+};
+
+export default config;
