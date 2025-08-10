@@ -1,11 +1,27 @@
 
 type Reservation {
   _id: ObjectId!
-  restaurant: ObjectId!
-  table: ObjectId!
+  confirmationCode: String!
+  restaurantId: ObjectId!
+  tableId: ObjectId!
+  partySize: Int!
   arrival: DateTime!
-  name: String!
+  firstName: String!
+  lastName: String!
   email: String!
+  message: String!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+type Mutation {
+  addReservation(
+    firstName: String!,
+    lastName: String!,
+    email: String!,
+    message: String,
+    arrival: DateTime!, 
+    partySize: Int!,
+    tableId: ObjectId!
+    ): Reservation! @public
 }

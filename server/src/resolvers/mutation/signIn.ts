@@ -2,8 +2,9 @@ import { MutationResolvers } from "../../generated/graphql";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { GraphQLError } from 'graphql';
+import { GraphQLContext } from '@/graphql/context';
 
-export const authResolvers: MutationResolvers = {
+export const authResolvers: MutationResolvers<GraphQLContext> = {
   async signIn(_, { email, password }, { users }) {
     const user = await users.findOne({ email });
     if (!user) {
