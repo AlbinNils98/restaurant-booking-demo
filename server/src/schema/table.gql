@@ -1,7 +1,8 @@
 
 type Table {
   _id: ObjectId!
-  reservations: [ObjectId!]!
+  restaurantId: ObjectId!
+  reservationIds: [ObjectId!]!
   availableDates: [DateTime!]!
-  size: Int
+  seats: Int!
 }

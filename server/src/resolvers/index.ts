@@ -1,14 +1,14 @@
 import type { Resolvers } from "../generated/graphql";
-import { authResolvers } from './mutation/signIn';
-import { userMutationResolvers } from "./mutation/user";
-import { userQueryResolvers } from "./query/user";
+import { authResolvers } from '@/resolvers/mutation/signIn';
+import { userQueryResolvers } from "@/resolvers/query/user";
+import { reservationMutationResolvers } from '@/resolvers/mutation/reservation';
 
 export const resolvers: Resolvers = {
   Query: {
     ...userQueryResolvers,
   },
   Mutation: {
-    ...userMutationResolvers,
     ...authResolvers,
+    ...reservationMutationResolvers
   },
 };

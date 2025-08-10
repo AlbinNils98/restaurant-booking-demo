@@ -2,5 +2,5 @@
 type Restaurant {
   _id: ObjectId!
   name: String!
-  tables: [ObjectId!]!
+  tableIds: [ObjectId!]!
 }
