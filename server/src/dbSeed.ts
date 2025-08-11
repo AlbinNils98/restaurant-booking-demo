@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { generate } from '@graphql-codegen/cli';
 import generateConfirmationCode from './util/generateConfirmationCode';
 import normalizeDate from './util/normalizeDate';
+import { CategoryName } from './generated/graphql';
 
 export async function seedInitialData(db: Db) {
   const userCollection = db.collection("user");
@@ -70,14 +71,45 @@ export async function seedInitialData(db: Db) {
         _id: new ObjectId(),
         name: "Sunny Side Diner",
         tables: [tableIds[0]],
+        menu: [
+          {
+            category: CategoryName.Breakfast,
+            items: [
+              { _id: new ObjectId(), name: "Pancakes", description: "Fluffy pancakes with syrup", price: 5000, vegetarian: true },
+              { _id: new ObjectId(), name: "Bacon & Eggs", description: "Two eggs with crispy bacon", price: 9000, vegetarian: false },
+            ],
+          },
+          {
+            category: "Drinks",
+            items: [
+              { _id: new ObjectId(), name: "Coffee", description: "Freshly brewed", price: 2500, vegetarian: true },
+              { _id: new ObjectId(), name: "Orange Juice", description: "Fresh squeezed", price: 3000, vegetarian: true },
+            ],
+          },
+        ],
       },
       {
         _id: new ObjectId(),
         name: "Moonlight Eatery",
         tables: [tableIds[1]],
+        menu: [
+          {
+            category: CategoryName.Dinner,
+            items: [
+              { name: "Steak", description: "Grilled sirloin steak", price: 12000, vegetarian: false },
+              { name: "Caesar Salad", description: "Crisp romaine with dressing", price: 8.99, vegetarian: true },
+            ],
+          },
+          {
+            category: "Desserts",
+            items: [
+              { name: "Cheesecake", description: "Creamy classic", price: 6500, vegetarian: true },
+            ],
+          },
+        ],
       },
     ]);
-    console.log("✅ Inserted initial restaurants");
+    console.log("✅ Inserted initial restaurants with menus");
   }
 
   // // Insert initial Reservations

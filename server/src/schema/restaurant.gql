@@ -1,6 +1,45 @@
 
+type Mutation {
+  addMenuItem(
+    restaurantId: ObjectId!, 
+    categoryName: CategoryName!,
+    name: String!,
+    description: String,
+    price: Float!,
+    vegetarian: Boolean!
+    ): MenuItem!
+  removeMenuItem(
+    restaurantId: ObjectId!,
+    categoryName: CategoryName!,
+    itemId: ObjectId!
+  ): Boolean!
+}
+
 type Restaurant {
   _id: ObjectId!
   name: String!
   tableIds: [ObjectId!]!
+  menu: [MenuCategory!]!
+}
+
+type MenuCategory {
+  category: String!
+  items: [MenuItem!]!
+}
+
+type MenuItem {
+  _id: ObjectId!
+  name: String!
+  description: String
+  price: Int!
+  vegetarian: Boolean!
+}
+
+enum CategoryName {
+  BREAKFAST
+  LUNCH
+  DINNER
+  APPETIZERS
+  DESSERTS
+  DRINKS
 }

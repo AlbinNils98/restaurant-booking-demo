@@ -19,11 +19,47 @@ export type Scalars = {
   ObjectId: { input: ObjectId; output: ObjectId; }
 };
 
+export enum CategoryName {
+  Appetizers = 'APPETIZERS',
+  Breakfast = 'BREAKFAST',
+  Desserts = 'DESSERTS',
+  Dinner = 'DINNER',
+  Drinks = 'DRINKS',
+  Lunch = 'LUNCH'
+}
+
+export type MenuCategory = {
+  __typename?: 'MenuCategory';
+  category: Scalars['String']['output'];
+  items: Array<MenuItem>;
+};
+
+export type MenuItem = {
+  __typename?: 'MenuItem';
+  _id: Scalars['ObjectId']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  price: Scalars['Int']['output'];
+  vegetarian: Scalars['Boolean']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
+  addMenuItem: MenuItem;
   addReservation: Reservation;
   addUser: User;
+  removeMenuItem: Scalars['Boolean']['output'];
   signIn: Scalars['String']['output'];
+};
+
+
+export type MutationAddMenuItemArgs = {
+  categoryName: CategoryName;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  price: Scalars['Float']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  vegetarian: Scalars['Boolean']['input'];
 };
 
 
@@ -42,6 +78,13 @@ export type MutationAddUserArgs = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveMenuItemArgs = {
+  categoryName: CategoryName;
+  itemId: Scalars['ObjectId']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
 };
 
 
@@ -86,6 +129,7 @@ export type Reservation = {
 export type Restaurant = {
   __typename?: 'Restaurant';
   _id: Scalars['ObjectId']['output'];
+  menu: Array<MenuCategory>;
   name: Scalars['String']['output'];
   tableIds: Array<Scalars['ObjectId']['output']>;
 };
@@ -189,10 +233,15 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  CategoryName: CategoryName;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
-  Mutation: ResolverTypeWrapper<{}>;
+  MenuCategory: ResolverTypeWrapper<MenuCategory>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  MenuItem: ResolverTypeWrapper<MenuItem>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Mutation: ResolverTypeWrapper<{}>;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ObjectId: ResolverTypeWrapper<Scalars['ObjectId']['output']>;
   Query: ResolverTypeWrapper<{}>;
   Reservation: ResolverTypeWrapper<Reservation>;
@@ -201,15 +250,18 @@ export type ResolversTypes = {
   Table: ResolverTypeWrapper<Table>;
   User: ResolverTypeWrapper<User>;
   AdditionalEntityFields: AdditionalEntityFields;
-  Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   DateTime: Scalars['DateTime']['output'];
-  Mutation: {};
+  MenuCategory: MenuCategory;
   String: Scalars['String']['output'];
+  MenuItem: MenuItem;
   Int: Scalars['Int']['output'];
+  Boolean: Scalars['Boolean']['output'];
+  Mutation: {};
+  Float: Scalars['Float']['output'];
   ObjectId: Scalars['ObjectId']['output'];
   Query: {};
   Reservation: Reservation;
@@ -217,7 +269,6 @@ export type ResolversParentTypes = {
   Table: Table;
   User: User;
   AdditionalEntityFields: AdditionalEntityFields;
-  Boolean: Scalars['Boolean']['output'];
 };
 
 export type AuthDirectiveArgs = {
@@ -281,9 +332,26 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
   name: 'DateTime';
 }
 
+export type MenuCategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['MenuCategory'] = ResolversParentTypes['MenuCategory']> = {
+  category?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes['MenuItem']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type MenuItemResolvers<ContextType = any, ParentType extends ResolversParentTypes['MenuItem'] = ResolversParentTypes['MenuItem']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  vegetarian?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationAddMenuItemArgs, 'categoryName' | 'name' | 'price' | 'restaurantId' | 'vegetarian'>>;
   addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'arrival' | 'email' | 'firstName' | 'lastName' | 'partySize' | 'tableId'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
+  removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'categoryName' | 'itemId' | 'restaurantId'>>;
   signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
 };
 
@@ -315,6 +383,7 @@ export type ReservationResolvers<ContextType = any, ParentType extends Resolvers
 
 export type RestaurantResolvers<ContextType = any, ParentType extends ResolversParentTypes['Restaurant'] = ResolversParentTypes['Restaurant']> = {
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  menu?: Resolver<Array<ResolversTypes['MenuCategory']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   tableIds?: Resolver<Array<ResolversTypes['ObjectId']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -340,6 +409,8 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
 
 export type Resolvers<ContextType = any> = {
   DateTime?: GraphQLScalarType;
+  MenuCategory?: MenuCategoryResolvers<ContextType>;
+  MenuItem?: MenuItemResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   ObjectId?: GraphQLScalarType;
   Query?: QueryResolvers<ContextType>;
