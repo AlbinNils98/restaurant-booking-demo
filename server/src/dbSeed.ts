@@ -3,21 +3,21 @@ import bcrypt from "bcryptjs";
 import { generate } from '@graphql-codegen/cli';
 import generateConfirmationCode from './util/generateConfirmationCode';
 import normalizeDate from './util/normalizeDate';
-import { CategoryName } from './generated/graphql';
+import { CategoryName, Reservation, Restaurant, Role, Table, User } from './generated/graphql';
 
 export async function seedInitialData(db: Db) {
-  const userCollection = db.collection("user");
-  const restaurantCollection = db.collection("restaurant");
-  const tableCollection = db.collection("table");
-  const reservationCollection = db.collection("reservation");
+  const userCollection = db.collection<User>("user");
+  const restaurantCollection = db.collection<Restaurant>("restaurant");
+  const tableCollection = db.collection<Table>("table");
+  const reservationCollection = db.collection<Reservation>("reservation");
 
   // Insert initial users
   const usersCount = await userCollection.countDocuments();
   if (usersCount === 0) {
     const passwordHash = await bcrypt.hash("password", 10);
     const initialUsers = [
-      { _id: new ObjectId(), name: "Alice", email: "alice@example.com", role: "Admin", password: passwordHash },
-      { _id: new ObjectId(), name: "Bob", email: "bob@example.com", role: "User", password: passwordHash },
+      { _id: new ObjectId(), name: "Alice", email: "alice@example.com", role: Role.Admin, password: passwordHash },
+      { _id: new ObjectId(), name: "Bob", email: "bob@example.com", role: Role.User, password: passwordHash },
     ];
     await userCollection.insertMany(initialUsers);
     console.log("✅ Inserted initial users");
@@ -70,7 +70,7 @@ export async function seedInitialData(db: Db) {
       {
         _id: new ObjectId(),
         name: "Sunny Side Diner",
-        tables: [tableIds[0]],
+        tableIds: [tableIds[0]],
         menu: [
           {
             category: CategoryName.Breakfast,
@@ -91,19 +91,19 @@ export async function seedInitialData(db: Db) {
       {
         _id: new ObjectId(),
         name: "Moonlight Eatery",
-        tables: [tableIds[1]],
+        tableIds: [tableIds[1]],
         menu: [
           {
             category: CategoryName.Dinner,
             items: [
-              { name: "Steak", description: "Grilled sirloin steak", price: 12000, vegetarian: false },
-              { name: "Caesar Salad", description: "Crisp romaine with dressing", price: 8.99, vegetarian: true },
+              { _id: new ObjectId(), name: "Steak", description: "Grilled sirloin steak", price: 12000, vegetarian: false },
+              { _id: new ObjectId(), name: "Caesar Salad", description: "Crisp romaine with dressing", price: 8.99, vegetarian: true },
             ],
           },
           {
             category: "Desserts",
             items: [
-              { name: "Cheesecake", description: "Creamy classic", price: 6500, vegetarian: true },
+              { _id: new ObjectId(), name: "Cheesecake", description: "Creamy classic", price: 6500, vegetarian: true },
             ],
           },
         ],
