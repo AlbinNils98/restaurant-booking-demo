@@ -8,11 +8,22 @@ type Mutation {
     price: Float!,
     vegetarian: Boolean!
     ): MenuItem!
+
   removeMenuItem(
     restaurantId: ObjectId!,
     categoryName: CategoryName!,
     itemId: ObjectId!
   ): Boolean!
+
+  updateMenuItem(
+    restaurantId: ObjectId!,
+    itemId: ObjectId!,
+    categoryName: CategoryName,
+    name: String,
+    description: String,
+    price: Float,
+    vegetarian: Boolean
+  ): MenuItem!
 }
 
 type Restaurant {

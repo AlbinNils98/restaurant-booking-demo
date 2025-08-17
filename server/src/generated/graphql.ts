@@ -50,6 +50,7 @@ export type Mutation = {
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
   signIn: Scalars['String']['output'];
+  updateMenuItem: MenuItem;
 };
 
 
@@ -91,6 +92,17 @@ export type MutationRemoveMenuItemArgs = {
 export type MutationSignInArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateMenuItemArgs = {
+  categoryName?: InputMaybe<CategoryName>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  itemId: Scalars['ObjectId']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
+  restaurantId: Scalars['ObjectId']['input'];
+  vegetarian?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type Query = {
@@ -353,6 +365,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'categoryName' | 'itemId' | 'restaurantId'>>;
   signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
+  updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;
 };
 
 export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['ObjectId'], any> {
