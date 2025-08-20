@@ -65,13 +65,13 @@ export type MutationAddMenuItemArgs = {
 
 
 export type MutationAddReservationArgs = {
-  arrival: Scalars['DateTime']['input'];
   email: Scalars['String']['input'];
   firstName: Scalars['String']['input'];
   lastName: Scalars['String']['input'];
   message?: InputMaybe<Scalars['String']['input']>;
   partySize: Scalars['Int']['input'];
-  tableId: Scalars['ObjectId']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  sittingStart: Scalars['DateTime']['input'];
 };
 
 
@@ -107,9 +107,17 @@ export type MutationUpdateMenuItemArgs = {
 
 export type Query = {
   __typename?: 'Query';
+  getAllRestaurants: Array<RestaurantDto>;
+  getAvailableSittings: Array<Scalars['DateTime']['output']>;
   user?: Maybe<User>;
   userByName?: Maybe<User>;
   users: Array<User>;
+};
+
+
+export type QueryGetAvailableSittingsArgs = {
+  partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
 };
 
 
@@ -125,7 +133,6 @@ export type QueryUserByNameArgs = {
 export type Reservation = {
   __typename?: 'Reservation';
   _id: Scalars['ObjectId']['output'];
-  arrival: Scalars['DateTime']['output'];
   confirmationCode: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   email: Scalars['String']['output'];
@@ -134,6 +141,8 @@ export type Reservation = {
   message: Scalars['String']['output'];
   partySize: Scalars['Int']['output'];
   restaurantId: Scalars['ObjectId']['output'];
+  sittingEnd: Scalars['DateTime']['output'];
+  sittingStart: Scalars['DateTime']['output'];
   tableId: Scalars['ObjectId']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -143,7 +152,14 @@ export type Restaurant = {
   _id: Scalars['ObjectId']['output'];
   menu: Array<MenuCategory>;
   name: Scalars['String']['output'];
-  tableIds: Array<Scalars['ObjectId']['output']>;
+  openingDays: Array<WeekDays>;
+  sittings: Array<Sitting>;
+};
+
+export type RestaurantDto = {
+  __typename?: 'RestaurantDto';
+  _id: Scalars['ObjectId']['output'];
+  name?: Maybe<Scalars['String']['output']>;
 };
 
 export enum Role {
@@ -151,13 +167,27 @@ export enum Role {
   User = 'USER'
 }
 
+export type Sitting = {
+  __typename?: 'Sitting';
+  durationMinutes: Scalars['Int']['output'];
+  startTime: Scalars['String']['output'];
+};
+
 export type Table = {
   __typename?: 'Table';
   _id: Scalars['ObjectId']['output'];
-  availableDates: Array<Scalars['DateTime']['output']>;
-  reservationIds: Array<Scalars['ObjectId']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  name: Scalars['String']['output'];
   restaurantId: Scalars['ObjectId']['output'];
   seats: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type TableDto = {
+  __typename?: 'TableDto';
+  _id: Scalars['ObjectId']['output'];
+  availableDates: Array<Scalars['DateTime']['output']>;
+  restaurantId: Scalars['ObjectId']['output'];
 };
 
 export type User = {
@@ -168,6 +198,16 @@ export type User = {
   password: Scalars['String']['output'];
   role: Role;
 };
+
+export enum WeekDays {
+  Friday = 'FRIDAY',
+  Monday = 'MONDAY',
+  Saturday = 'SATURDAY',
+  Sunday = 'SUNDAY',
+  Thursday = 'THURSDAY',
+  Tuesday = 'TUESDAY',
+  Wednesday = 'WEDNESDAY'
+}
 
 export type AdditionalEntityFields = {
   path?: InputMaybe<Scalars['String']['input']>;
@@ -258,9 +298,13 @@ export type ResolversTypes = {
   Query: ResolverTypeWrapper<{}>;
   Reservation: ResolverTypeWrapper<Reservation>;
   Restaurant: ResolverTypeWrapper<Restaurant>;
+  RestaurantDto: ResolverTypeWrapper<RestaurantDto>;
   Role: Role;
+  Sitting: ResolverTypeWrapper<Sitting>;
   Table: ResolverTypeWrapper<Table>;
+  TableDto: ResolverTypeWrapper<TableDto>;
   User: ResolverTypeWrapper<User>;
+  WeekDays: WeekDays;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
@@ -278,7 +322,10 @@ export type ResolversParentTypes = {
   Query: {};
   Reservation: Reservation;
   Restaurant: Restaurant;
+  RestaurantDto: RestaurantDto;
+  Sitting: Sitting;
   Table: Table;
+  TableDto: TableDto;
   User: User;
   AdditionalEntityFields: AdditionalEntityFields;
 };
@@ -361,7 +408,7 @@ export type MenuItemResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationAddMenuItemArgs, 'categoryName' | 'name' | 'price' | 'restaurantId' | 'vegetarian'>>;
-  addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'arrival' | 'email' | 'firstName' | 'lastName' | 'partySize' | 'tableId'>>;
+  addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'email' | 'firstName' | 'lastName' | 'partySize' | 'restaurantId' | 'sittingStart'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'categoryName' | 'itemId' | 'restaurantId'>>;
   signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
@@ -373,6 +420,8 @@ export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 }
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  getAllRestaurants?: Resolver<Array<ResolversTypes['RestaurantDto']>, ParentType, ContextType>;
+  getAvailableSittings?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType, RequireFields<QueryGetAvailableSittingsArgs, 'partySize' | 'restaurantId'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, '_id'>>;
   userByName?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserByNameArgs, 'name'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
@@ -380,7 +429,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type ReservationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Reservation'] = ResolversParentTypes['Reservation']> = {
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
-  arrival?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   confirmationCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -389,6 +437,8 @@ export type ReservationResolvers<ContextType = any, ParentType extends Resolvers
   message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   partySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  sittingEnd?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  sittingStart?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   tableId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -398,16 +448,37 @@ export type RestaurantResolvers<ContextType = any, ParentType extends ResolversP
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   menu?: Resolver<Array<ResolversTypes['MenuCategory']>, ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
-  tableIds?: Resolver<Array<ResolversTypes['ObjectId']>, ParentType, ContextType>;
+  openingDays?: Resolver<Array<ResolversTypes['WeekDays']>, ParentType, ContextType>;
+  sittings?: Resolver<Array<ResolversTypes['Sitting']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type RestaurantDtoResolvers<ContextType = any, ParentType extends ResolversParentTypes['RestaurantDto'] = ResolversParentTypes['RestaurantDto']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type SittingResolvers<ContextType = any, ParentType extends ResolversParentTypes['Sitting'] = ResolversParentTypes['Sitting']> = {
+  durationMinutes?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  startTime?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TableResolvers<ContextType = any, ParentType extends ResolversParentTypes['Table'] = ResolversParentTypes['Table']> = {
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
-  availableDates?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType>;
-  reservationIds?: Resolver<Array<ResolversTypes['ObjectId']>, ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   seats?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type TableDtoResolvers<ContextType = any, ParentType extends ResolversParentTypes['TableDto'] = ResolversParentTypes['TableDto']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  availableDates?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -429,7 +500,10 @@ export type Resolvers<ContextType = any> = {
   Query?: QueryResolvers<ContextType>;
   Reservation?: ReservationResolvers<ContextType>;
   Restaurant?: RestaurantResolvers<ContextType>;
+  RestaurantDto?: RestaurantDtoResolvers<ContextType>;
+  Sitting?: SittingResolvers<ContextType>;
   Table?: TableResolvers<ContextType>;
+  TableDto?: TableDtoResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
 };
 

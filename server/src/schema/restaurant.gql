@@ -26,11 +26,37 @@ type Mutation {
   ): MenuItem!
 }
 
+type Query {
+    getAllRestaurants: [RestaurantDto!]! @public
+    getAvailableSittings(restaurantId: ObjectId!, partySize: Int!): [DateTime!]! @public
+}
+
+type RestaurantDto {
+  _id: ObjectId!,
+  name: String,
+}
+
 type Restaurant {
   _id: ObjectId!
   name: String!
-  tableIds: [ObjectId!]!
+  openingDays: [WeekDays!]!
+  sittings: [Sitting!]!
   menu: [MenuCategory!]!
+}
+
+enum WeekDays {
+  MONDAY
+  TUESDAY
+  WEDNESDAY
+  THURSDAY
+  FRIDAY
+  SATURDAY
+  SUNDAY
+}
+
+type Sitting {
+  startTime: String!
+  durationMinutes: Int!
 }
 
 type MenuCategory {

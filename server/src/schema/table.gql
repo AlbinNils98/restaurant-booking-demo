@@ -2,7 +2,14 @@
 type Table {
   _id: ObjectId!
   restaurantId: ObjectId!
-  reservationIds: [ObjectId!]!
-  availableDates: [DateTime!]!
+  name: String!
   seats: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type TableDto {
+  _id: ObjectId!
+  restaurantId: ObjectId!
+  availableDates: [DateTime!]!
 }
