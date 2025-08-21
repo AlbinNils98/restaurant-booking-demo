@@ -1,26 +1,63 @@
-import { Box, Flex, Heading, HStack, Spacer, Link } from "@chakra-ui/react";
+import { Box, Stack, Divider, Typography, Link as MuiLink } from "@mui/material";
+import { Link as RouterLink } from "react-router-dom";
 
-
-const VerticalDivider = () => (
-  <Box h="6" w="1px" bg="gray.600" />
+const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode }) => (
+  <MuiLink
+    component={RouterLink}
+    to={to}
+    underline="none"
+    sx={{
+      position: "relative",
+      color: "inherit",
+      fontWeight: 500,
+      "&::after": {
+        content: '""',
+        position: "absolute",
+        left: 0,
+        bottom: -2,
+        height: 2,
+        width: "0%",
+        bgcolor: "white",
+        transition: "width 0.3s ease",
+      },
+      "&:hover::after": {
+        width: "100%",
+      },
+    }}
+  >
+    {children}
+  </MuiLink>
 );
+
+function HeaderLinks() {
+  return (
+    <Stack direction="row" spacing={4} alignItems="center">
+      <UnderlineLink to="/menu">Menu</UnderlineLink>
+      <UnderlineLink to="/booking">Book a table</UnderlineLink>
+      <UnderlineLink to="/contact">Contact</UnderlineLink>
+    </Stack>
+  );
+}
 
 export function Header() {
   return (
-    <Box bg="gray.800" px={4} py={3} color="white" w={"100%"}>
-      <Flex alignItems="center">
-        <Link href="/" style={{ textDecoration: 'none', color: 'white' }}>
-          <Heading size="md">RestaurantDemo</Heading>
-        </Link>
-        <Spacer />
-        <HStack gap={4}>
-          <Link href="/menu">Menu</Link>
-          <VerticalDivider />
-          <Link href="/booking">Book a table</Link>
-          <VerticalDivider />
-          <Link href="/contact">Contact</Link>
-        </HStack>
-      </Flex>
+    <Box bgcolor="grey.900" py={3} color="white" width="100%">
+      <Stack direction="row" alignItems="center">
+        <MuiLink
+          component={RouterLink}
+          to="/"
+          underline="none"
+          color="inherit"
+          pl={1}
+        >
+          <Typography variant="h6">RestaurantDemo</Typography>
+        </MuiLink>
+
+        <Box flexGrow={1} />
+
+        <HeaderLinks />
+      </Stack>
+      <Divider sx={{ mt: 2, bgcolor: "grey.600" }} />
     </Box>
   );
 }
