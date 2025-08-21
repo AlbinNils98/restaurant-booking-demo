@@ -1,9 +1,17 @@
-import { Db, ObjectId } from "mongodb";
-import bcrypt from "bcryptjs";
-import { generate } from '@graphql-codegen/cli';
-import generateConfirmationCode from './util/generateConfirmationCode';
-import normalizeDate from './util/normalizeDate';
-import { CategoryName, Reservation, Restaurant, Role, Table, User } from './generated/graphql';
+import { Db, ObjectId } from 'mongodb';
+import { CategoryName, Reservation, Restaurant, Role, Table, User, WeekDays } from './generated/graphql';
+import * as bcrypt from 'bcryptjs';
+
+function makeDateTime(dateStr: string, timeStr: string) {
+  const [hours, minutes] = timeStr.split(":").map(Number);
+  const date = new Date(dateStr);
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function makeSittingEnd(start: Date, durationMinutes: number) {
+  return new Date(start.getTime() + durationMinutes * 60000);
+}
 
 export async function seedInitialData(db: Db) {
   const userCollection = db.collection<User>("user");
@@ -23,54 +31,18 @@ export async function seedInitialData(db: Db) {
     console.log("✅ Inserted initial users");
   }
 
-  // Insert initial Tables with restaurantId
-  const tablesCount = await tableCollection.countDocuments();
-  if (tablesCount === 0) {
-    const restaurantIds = (await restaurantCollection.find().limit(2).toArray()).map(r => r._id);
-    // If restaurants don't exist yet, create dummy ObjectIds here or insert restaurants first.
-
-    // For safety, if no restaurants yet, create dummy IDs:
-    const restId1 = restaurantIds[0] ?? new ObjectId();
-    const restId2 = restaurantIds[1] ?? new ObjectId();
-
-    const table1Id = new ObjectId();
-    const table2Id = new ObjectId();
-
-    await tableCollection.insertMany([
-      {
-        _id: table1Id,
-        restaurantId: restId1,
-        reservationIds: [],
-        availableDates: [
-          normalizeDate(new Date("2025-08-10T12:00:00Z")),
-          normalizeDate(new Date("2025-08-11T12:00:00Z")),
-        ],
-        seats: 4,
-      },
-      {
-        _id: table2Id,
-        restaurantId: restId2,
-        reservationIds: [],
-        availableDates: [
-          normalizeDate(new Date("2025-08-12T12:00:00Z")),
-          normalizeDate(new Date("2025-08-13T12:00:00Z")),
-        ],
-        seats: 2,
-      },
-    ]);
-    console.log("✅ Inserted initial tables");
-  }
-
   // Insert initial Restaurants
   const restaurantsCount = await restaurantCollection.countDocuments();
+  let restaurantIds: ObjectId[] = [];
+
   if (restaurantsCount === 0) {
-    const tableIds = (await tableCollection.find().limit(2).toArray()).map(t => t._id);
+    const rest1Id = new ObjectId();
+    const rest2Id = new ObjectId();
 
     await restaurantCollection.insertMany([
       {
-        _id: new ObjectId(),
+        _id: rest1Id,
         name: "Sunny Side Diner",
-        tableIds: [tableIds[0]],
         menu: [
           {
             category: CategoryName.Breakfast,
@@ -79,44 +51,73 @@ export async function seedInitialData(db: Db) {
               { _id: new ObjectId(), name: "Bacon & Eggs", description: "Two eggs with crispy bacon", price: 9000, vegetarian: false },
             ],
           },
-          {
-            category: "Drinks",
-            items: [
-              { _id: new ObjectId(), name: "Coffee", description: "Freshly brewed", price: 2500, vegetarian: true },
-              { _id: new ObjectId(), name: "Orange Juice", description: "Fresh squeezed", price: 3000, vegetarian: true },
-            ],
-          },
+        ],
+        openingDays: [WeekDays.Tuesday, WeekDays.Wednesday, WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday],
+        sittings: [
+          { startTime: "08:00", durationMinutes: 90 },
+          { startTime: "09:30", durationMinutes: 90 },
+          { startTime: "11:00", durationMinutes: 90 },
+          { startTime: "12:30", durationMinutes: 90 },
+          { startTime: "14:00", durationMinutes: 90 },
+          { startTime: "18:00", durationMinutes: 120 },
+          { startTime: "20:30", durationMinutes: 120 },
         ],
       },
       {
-        _id: new ObjectId(),
+        _id: rest2Id,
         name: "Moonlight Eatery",
-        tableIds: [tableIds[1]],
         menu: [
           {
             category: CategoryName.Dinner,
             items: [
               { _id: new ObjectId(), name: "Steak", description: "Grilled sirloin steak", price: 12000, vegetarian: false },
-              { _id: new ObjectId(), name: "Caesar Salad", description: "Crisp romaine with dressing", price: 8.99, vegetarian: true },
-            ],
-          },
-          {
-            category: "Desserts",
-            items: [
-              { _id: new ObjectId(), name: "Cheesecake", description: "Creamy classic", price: 6500, vegetarian: true },
             ],
           },
         ],
+        openingDays: [WeekDays.Tuesday, WeekDays.Wednesday, WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday],
+        sittings: [
+          { startTime: "16:00", durationMinutes: 90 },
+          { startTime: "17:30", durationMinutes: 90 },
+          { startTime: "19:00", durationMinutes: 90 },
+          { startTime: "20:30", durationMinutes: 90 },
+          { startTime: "22:00", durationMinutes: 90 },
+        ],
       },
     ]);
-    console.log("✅ Inserted initial restaurants with menus");
+
+    console.log("✅ Inserted restaurants");
+    restaurantIds = [rest1Id, rest2Id];
+  } else {
+    restaurantIds = (await restaurantCollection.find().limit(2).toArray()).map(r => r._id);
   }
 
-  // // Insert initial Reservations
+  // Insert Tables (more per restaurant)
+  const tablesCount = await tableCollection.countDocuments();
+  if (tablesCount === 0) {
+    const tables = [
+      // Sunny Side Diner
+      { _id: new ObjectId(), restaurantId: restaurantIds[0], name: "Window 1", seats: 2, createdAt: new Date(), updatedAt: new Date() },
+      { _id: new ObjectId(), restaurantId: restaurantIds[0], name: "Window 2", seats: 4, createdAt: new Date(), updatedAt: new Date() },
+      { _id: new ObjectId(), restaurantId: restaurantIds[0], name: "Booth 1", seats: 6, createdAt: new Date(), updatedAt: new Date() },
+
+      // Moonlight Eatery
+      { _id: new ObjectId(), restaurantId: restaurantIds[1], name: "Terrace 1", seats: 2, createdAt: new Date(), updatedAt: new Date() },
+      { _id: new ObjectId(), restaurantId: restaurantIds[1], name: "Terrace 2", seats: 4, createdAt: new Date(), updatedAt: new Date() },
+      { _id: new ObjectId(), restaurantId: restaurantIds[1], name: "Main Hall 1", seats: 8, createdAt: new Date(), updatedAt: new Date() },
+    ];
+
+    await tableCollection.insertMany(tables);
+    console.log("✅ Inserted tables linked to restaurants");
+  }
+
+  // // Insert initial Reservations (commented out)
   // const reservationsCount = await reservationCollection.countDocuments();
   // if (reservationsCount === 0) {
   //   const restaurants = await restaurantCollection.find().limit(2).toArray();
   //   const tables = await tableCollection.find().limit(2).toArray();
+
+  //   const sittingStart = makeDateTime("2025-08-10", "18:00");
+  //   const sittingEnd = makeSittingEnd(sittingStart, 120);
 
   //   await reservationCollection.insertMany([
   //     {
@@ -124,22 +125,13 @@ export async function seedInitialData(db: Db) {
   //       confirmationCode: generateConfirmationCode(),
   //       restaurantId: restaurants[0]._id,
   //       tableId: tables[0]._id,
-  //       arrival: new Date("2025-08-10T12:30:00Z"),
-  //       partySize: 4,
-  //       name: "John Doe",
-  //       email: "john@example.com",
-  //       createdAt: new Date(),
-  //       updatedAt: new Date(),
-  //     },
-  //     {
-  //       _id: new ObjectId(),
-  //       confirmationCode: generateConfirmationCode(),
-  //       restaurantId: restaurants[1]._id,
-  //       tableId: tables[1]._id,
-  //       arrival: new Date("2025-08-12T18:30:00Z"),
+  //       sittingStart,
+  //       sittingEnd,
   //       partySize: 2,
-  //       name: "Jane Smith",
-  //       email: "jane@example.com",
+  //       firstName: "John",
+  //       lastName: "Doe",
+  //       email: "john@example.com",
+  //       status: "CONFIRMED",
   //       createdAt: new Date(),
   //       updatedAt: new Date(),
   //     },

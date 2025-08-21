@@ -1,0 +1,374 @@
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+export type Maybe<T> = T | null;
+export type InputMaybe<T> = Maybe<T>;
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+const defaultOptions = {} as const;
+/** All built-in and custom scalars, mapped to their actual values */
+export type Scalars = {
+  ID: { input: string; output: string; }
+  String: { input: string; output: string; }
+  Boolean: { input: boolean; output: boolean; }
+  Int: { input: number; output: number; }
+  Float: { input: number; output: number; }
+  DateTime: { input: string; output: string; }
+  ObjectId: { input: string; output: string; }
+};
+
+export enum CategoryName {
+  Appetizers = 'APPETIZERS',
+  Breakfast = 'BREAKFAST',
+  Desserts = 'DESSERTS',
+  Dinner = 'DINNER',
+  Drinks = 'DRINKS',
+  Lunch = 'LUNCH'
+}
+
+export type MenuCategory = {
+  __typename?: 'MenuCategory';
+  category: Scalars['String']['output'];
+  items: Array<MenuItem>;
+};
+
+export type MenuItem = {
+  __typename?: 'MenuItem';
+  _id: Scalars['ObjectId']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  price: Scalars['Int']['output'];
+  vegetarian: Scalars['Boolean']['output'];
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  addMenuItem: MenuItem;
+  addReservation: Reservation;
+  addUser: User;
+  removeMenuItem: Scalars['Boolean']['output'];
+  signIn: Scalars['String']['output'];
+  updateMenuItem: MenuItem;
+};
+
+
+export type MutationAddMenuItemArgs = {
+  categoryName: CategoryName;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  price: Scalars['Float']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  vegetarian: Scalars['Boolean']['input'];
+};
+
+
+export type MutationAddReservationArgs = {
+  email: Scalars['String']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  message?: InputMaybe<Scalars['String']['input']>;
+  partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  sittingStart: Scalars['DateTime']['input'];
+};
+
+
+export type MutationAddUserArgs = {
+  email: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+
+export type MutationRemoveMenuItemArgs = {
+  categoryName: CategoryName;
+  itemId: Scalars['ObjectId']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationSignInArgs = {
+  email: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateMenuItemArgs = {
+  categoryName?: InputMaybe<CategoryName>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  itemId: Scalars['ObjectId']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  price?: InputMaybe<Scalars['Float']['input']>;
+  restaurantId: Scalars['ObjectId']['input'];
+  vegetarian?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type Query = {
+  __typename?: 'Query';
+  getAllRestaurants: Array<RestaurantDto>;
+  getAvailableSittings: Array<Scalars['DateTime']['output']>;
+  user?: Maybe<User>;
+  userByName?: Maybe<User>;
+  users: Array<User>;
+};
+
+
+export type QueryGetAvailableSittingsArgs = {
+  partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryUserArgs = {
+  _id: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryUserByNameArgs = {
+  name: Scalars['String']['input'];
+};
+
+export type Reservation = {
+  __typename?: 'Reservation';
+  _id: Scalars['ObjectId']['output'];
+  confirmationCode: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  partySize: Scalars['Int']['output'];
+  restaurantId: Scalars['ObjectId']['output'];
+  sittingEnd: Scalars['DateTime']['output'];
+  sittingStart: Scalars['DateTime']['output'];
+  tableId: Scalars['ObjectId']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type Restaurant = {
+  __typename?: 'Restaurant';
+  _id: Scalars['ObjectId']['output'];
+  menu: Array<MenuCategory>;
+  name: Scalars['String']['output'];
+  openingDays: Array<WeekDays>;
+  sittings: Array<Sitting>;
+};
+
+export type RestaurantDto = {
+  __typename?: 'RestaurantDto';
+  _id: Scalars['ObjectId']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+};
+
+export enum Role {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
+
+export type Sitting = {
+  __typename?: 'Sitting';
+  durationMinutes: Scalars['Int']['output'];
+  startTime: Scalars['String']['output'];
+};
+
+export type Table = {
+  __typename?: 'Table';
+  _id: Scalars['ObjectId']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  name: Scalars['String']['output'];
+  restaurantId: Scalars['ObjectId']['output'];
+  seats: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type TableDto = {
+  __typename?: 'TableDto';
+  _id: Scalars['ObjectId']['output'];
+  availableDates: Array<Scalars['DateTime']['output']>;
+  restaurantId: Scalars['ObjectId']['output'];
+};
+
+export type User = {
+  __typename?: 'User';
+  _id: Scalars['ObjectId']['output'];
+  email: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+  password: Scalars['String']['output'];
+  role: Role;
+};
+
+export enum WeekDays {
+  Friday = 'FRIDAY',
+  Monday = 'MONDAY',
+  Saturday = 'SATURDAY',
+  Sunday = 'SUNDAY',
+  Thursday = 'THURSDAY',
+  Tuesday = 'TUESDAY',
+  Wednesday = 'WEDNESDAY'
+}
+
+export type AddReservationMutationVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+  firstName: Scalars['String']['input'];
+  lastName: Scalars['String']['input'];
+  message?: InputMaybe<Scalars['String']['input']>;
+  sittingStart: Scalars['DateTime']['input'];
+  partySize: Scalars['Int']['input'];
+  email: Scalars['String']['input'];
+}>;
+
+
+export type AddReservationMutation = { __typename?: 'Mutation', addReservation: { __typename?: 'Reservation', _id: string, firstName: string, lastName: string, message: string, sittingStart: string, sittingEnd: string, partySize: number, email: string, restaurantId: string, tableId: string, createdAt: string } };
+
+export type GetAllRestaurantsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAllRestaurantsQuery = { __typename?: 'Query', getAllRestaurants: Array<{ __typename?: 'RestaurantDto', _id: string, name?: string | null }> };
+
+export type GetAvailableSittinsQueryVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+  partySize: Scalars['Int']['input'];
+}>;
+
+
+export type GetAvailableSittinsQuery = { __typename?: 'Query', getAvailableSittings: Array<string> };
+
+
+export const AddReservationDocument = gql`
+    mutation AddReservation($restaurantId: ObjectId!, $firstName: String!, $lastName: String!, $message: String, $sittingStart: DateTime!, $partySize: Int!, $email: String!) {
+  addReservation(
+    restaurantId: $restaurantId
+    firstName: $firstName
+    lastName: $lastName
+    message: $message
+    sittingStart: $sittingStart
+    partySize: $partySize
+    email: $email
+  ) {
+    _id
+    firstName
+    lastName
+    message
+    sittingStart
+    sittingEnd
+    partySize
+    email
+    restaurantId
+    tableId
+    createdAt
+  }
+}
+    `;
+export type AddReservationMutationFn = Apollo.MutationFunction<AddReservationMutation, AddReservationMutationVariables>;
+
+/**
+ * __useAddReservationMutation__
+ *
+ * To run a mutation, you first call `useAddReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addReservationMutation, { data, loading, error }] = useAddReservationMutation({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      message: // value for 'message'
+ *      sittingStart: // value for 'sittingStart'
+ *      partySize: // value for 'partySize'
+ *      email: // value for 'email'
+ *   },
+ * });
+ */
+export function useAddReservationMutation(baseOptions?: Apollo.MutationHookOptions<AddReservationMutation, AddReservationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddReservationMutation, AddReservationMutationVariables>(AddReservationDocument, options);
+      }
+export type AddReservationMutationHookResult = ReturnType<typeof useAddReservationMutation>;
+export type AddReservationMutationResult = Apollo.MutationResult<AddReservationMutation>;
+export type AddReservationMutationOptions = Apollo.BaseMutationOptions<AddReservationMutation, AddReservationMutationVariables>;
+export const GetAllRestaurantsDocument = gql`
+    query GetAllRestaurants {
+  getAllRestaurants {
+    _id
+    name
+  }
+}
+    `;
+
+/**
+ * __useGetAllRestaurantsQuery__
+ *
+ * To run a query within a React component, call `useGetAllRestaurantsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAllRestaurantsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAllRestaurantsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetAllRestaurantsQuery(baseOptions?: Apollo.QueryHookOptions<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>(GetAllRestaurantsDocument, options);
+      }
+export function useGetAllRestaurantsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>(GetAllRestaurantsDocument, options);
+        }
+export function useGetAllRestaurantsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>(GetAllRestaurantsDocument, options);
+        }
+export type GetAllRestaurantsQueryHookResult = ReturnType<typeof useGetAllRestaurantsQuery>;
+export type GetAllRestaurantsLazyQueryHookResult = ReturnType<typeof useGetAllRestaurantsLazyQuery>;
+export type GetAllRestaurantsSuspenseQueryHookResult = ReturnType<typeof useGetAllRestaurantsSuspenseQuery>;
+export type GetAllRestaurantsQueryResult = Apollo.QueryResult<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>;
+export const GetAvailableSittinsDocument = gql`
+    query GetAvailableSittins($restaurantId: ObjectId!, $partySize: Int!) {
+  getAvailableSittings(partySize: $partySize, restaurantId: $restaurantId)
+}
+    `;
+
+/**
+ * __useGetAvailableSittinsQuery__
+ *
+ * To run a query within a React component, call `useGetAvailableSittinsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAvailableSittinsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetAvailableSittinsQuery({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *      partySize: // value for 'partySize'
+ *   },
+ * });
+ */
+export function useGetAvailableSittinsQuery(baseOptions: Apollo.QueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables> & ({ variables: GetAvailableSittinsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+      }
+export function useGetAvailableSittinsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+        }
+export function useGetAvailableSittinsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+        }
+export type GetAvailableSittinsQueryHookResult = ReturnType<typeof useGetAvailableSittinsQuery>;
+export type GetAvailableSittinsLazyQueryHookResult = ReturnType<typeof useGetAvailableSittinsLazyQuery>;
+export type GetAvailableSittinsSuspenseQueryHookResult = ReturnType<typeof useGetAvailableSittinsSuspenseQuery>;
+export type GetAvailableSittinsQueryResult = Apollo.QueryResult<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>;

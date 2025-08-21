@@ -9,40 +9,55 @@ import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
 
 export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
-  addReservation: async (_parent, { firstName, lastName, message, arrival, email, partySize, tableId }, { restaurants, tables, reservations }) => {
-
+  addReservation: async (
+    _parent,
+    { firstName, lastName, message, sittingStart, email, partySize, restaurantId },
+    { restaurants, tables, reservations }
+  ) => {
     if (!validateEmail(email)) {
-      throw new GraphQLError('Invalid email format');
+      throw new GraphQLError("Invalid email format");
     }
 
-    const table = await tables.findOne({ _id: new ObjectId(tableId) });
+    const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
+    if (!restaurant) throw new GraphQLError("Restaurant not found");
 
-    const arrivalDate = normalizeDate(arrival);
+    // Find the sitting object for the selected start time
+    const sitting = restaurant.sittings.find(s => {
+      const [hours, minutes] = s.startTime.split(":").map(Number);
+      const sittingDate = new Date(sittingStart);
+      sittingDate.setHours(hours, minutes, 0, 0);
+      return sittingDate.getTime() === new Date(sittingStart).getTime();
+    });
 
-    // Check if the table exists
-    if (!table) {
-      throw new GraphQLError('Table not found');
-    }
+    if (!sitting) throw new GraphQLError("No sitting available at the selected time");
 
-    // Check that party size does not exceed table capacity
-    if (table.seats < partySize) {
-      throw new GraphQLError('Party size exceeds table capacity');
-    }
+    const sittingStartDate = new Date(sittingStart);
+    const sittingEnd = new Date(sittingStartDate.getTime() + sitting.durationMinutes * 60000);
 
-    // Check that time is still available
-    if (!table.availableDates.some(d => new Date(d).getTime() === arrivalDate.getTime())) {
-      throw new GraphQLError('Table is not available at the selected time');
-    }
+    // Find reservations that overlap with this sitting
+    const overlappingReservations = await reservations
+      .find({
+        restaurantId: restaurant._id,
+        $or: [
+          { sittingStart: { $lt: sittingEnd }, sittingEnd: { $gt: sittingStartDate } }
+        ]
+      })
+      .toArray();
 
-    const restaurant = await restaurants.findOne({ _id: table.restaurantId });
+    // Convert tableIds to string or ObjectId for matching
+    const reservedTableIds = overlappingReservations.map(r => r.tableId.toString());
 
-    // Check if the restaurant exists
-    if (!restaurant) {
-      throw new GraphQLError('Restaurant not found');
-    }
+    // Pick the first table that fits the party size and isn't reserved
+    const availableTable = await tables.findOne({
+      restaurantId: restaurant._id,
+      seats: { $gte: partySize },
+      _id: { $nin: reservedTableIds.map(id => new ObjectId(id)) },
+    });
 
-    const newReservationId = new ObjectId();
+    if (!availableTable) throw new GraphQLError("No tables available for this sitting");
+
     const now = new Date();
+    const newReservationId = new ObjectId();
 
     const newReservation = await reservations.findOneAndUpdate(
       { _id: newReservationId },
@@ -53,71 +68,49 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
           firstName,
           lastName,
           email,
-          message: message || '',
-          tableId: table._id,
-          restaurantId: table.restaurantId,
+          message: message || "",
+          tableId: availableTable._id,
+          restaurantId: restaurant._id,
           partySize,
-          arrival: arrivalDate,
+          sittingStart: sittingStartDate,
+          sittingEnd,
           createdAt: now,
           updatedAt: now,
-        }
-      },
-      { upsert: true, returnDocument: 'after' }
-    );
-
-    if (!newReservation) {
-      throw new GraphQLError('Failed to create reservation');
-    }
-
-    const removeDate = await tables.findOneAndUpdate(
-      { _id: new ObjectId(tableId) },
-      { $pull: { availableDates: arrivalDate }, $push: { reservationIds: newReservation._id } },
-      { returnDocument: 'after' }
-    );
-
-
-    if (removeDate?.availableDates.some(d => new Date(d).getTime() === arrivalDate.getTime())) {
-      await reservations.deleteOne({ _id: newReservation._id });
-      await tables.findOneAndUpdate(
-        { _id: new ObjectId(tableId) },
-        {
-          $pull: { reservationIds: newReservation._id },
-          $push: { availableDates: arrivalDate }
         },
-      );
-      throw new GraphQLError("Failed to update table availability");
-    }
+      },
+      { upsert: true, returnDocument: "after" }
+    );
 
-    await sendEmail(email
-      , "Your Table Booking is Confirmed!", confirmationMessage({
+    if (!newReservation) throw new GraphQLError("Failed to create reservation");
+
+    await sendEmail(
+      email,
+      "Your Table Booking is Confirmed!",
+      confirmationMessage({
         firstName,
         lastName,
         confirmationCode: newReservation.confirmationCode,
-        arrival: arrivalDate.toLocaleString(),
+        arrival: sittingStartDate.toLocaleString(),
         partySize,
-        restaurantName: restaurant.name
-      }), getTemplate(EmailTemplate.CONFIRMATION, {
+        restaurantName: restaurant.name,
+      }),
+      getTemplate(EmailTemplate.CONFIRMATION, {
         firstName,
         lastName,
         confirmationCode: newReservation.confirmationCode,
-        arrival: arrivalDate.toLocaleString(),
+        arrival: sittingStartDate.toLocaleString(),
         partySize,
-        restaurantName: restaurant.name
-      })).catch(async () => {
-        await reservations.deleteOne({ _id: newReservation._id });
-        await tables.findOneAndUpdate(
-          { _id: new ObjectId(tableId) },
-          {
-            $pull: { reservationIds: newReservation._id },
-            $push: { availableDates: arrivalDate }
-          },
-        );
-        throw new GraphQLError('Failed to confirm reservation via email, please contact the restaurant directly or try again at a later time.');
-
+        restaurantName: restaurant.name,
       })
+    ).catch(async () => {
+      await reservations.deleteOne({ _id: newReservation._id });
+      throw new GraphQLError(
+        "Failed to confirm reservation via email, please contact the restaurant directly or try again later."
+      );
+    });
 
     return newReservation;
-  }
+  },
 }
 
 const confirmationMessage = ({

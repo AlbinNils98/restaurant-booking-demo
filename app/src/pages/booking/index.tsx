@@ -1,12 +1,12 @@
+import { BookingProvider } from '../../context/Booking';
+import BookingFLow from './components/BookingFlow';
+
+export default function BookingPage() {
 
 
-const BookingPage = () => {
   return (
-    <div>
-      <h1>Booking Page</h1>
-      <p>In progress</p>
-    </div>
+    <BookingProvider>
+      <BookingFLow />
+    </BookingProvider>
   );
 }
-
-export default BookingPage;
