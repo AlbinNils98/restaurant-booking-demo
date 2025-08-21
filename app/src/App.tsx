@@ -1,5 +1,4 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
 import HomePage from "./pages/home";
 import BookingPage from "./pages/booking";
 import MenuPage from "./pages/menu";
@@ -7,6 +6,10 @@ import NotFoundPage from './pages/notFound';
 import Header from './components/header';
 import ContactPage from './pages/contact';
 import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import LoginPage from './pages/login';
+import { AuthProvider } from './context/Auth';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import MenuPortalPage from './pages/portal/menu';
 
 const App = () => {
 
@@ -27,14 +30,22 @@ const App = () => {
       <ThemeProvider theme={theme}>
         <CssBaseline />
         <BrowserRouter>
-          <Header />
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/booking" element={<BookingPage />} />
-            <Route path="/menu" element={<MenuPage />} />
-            <Route path="/contact" element={<ContactPage />} />
-            <Route path="*" element={<NotFoundPage />} />
-          </Routes>
+          <AuthProvider>
+            <Header />
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/booking" element={<BookingPage />} />
+              <Route path="/menu" element={<MenuPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+              <Route path='/login' element={<LoginPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+              <Route path='/admin/menu' element={
+                <ProtectedRoute>
+                  <MenuPortalPage />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>
     </Box>
