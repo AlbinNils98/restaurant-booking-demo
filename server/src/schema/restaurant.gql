@@ -27,6 +27,7 @@ type Mutation {
 }
 
 type Query {
+    getMenu(restaurantId: ObjectId!): [MenuCategory!]! @public 
     getAllRestaurants: [RestaurantDto!]! @public
     getAvailableSittings(restaurantId: ObjectId!, partySize: Int!): [DateTime!]! @public
 }

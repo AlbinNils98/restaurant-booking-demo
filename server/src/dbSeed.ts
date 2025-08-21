@@ -49,6 +49,43 @@ export async function seedInitialData(db: Db) {
             items: [
               { _id: new ObjectId(), name: "Pancakes", description: "Fluffy pancakes with syrup", price: 5000, vegetarian: true },
               { _id: new ObjectId(), name: "Bacon & Eggs", description: "Two eggs with crispy bacon", price: 9000, vegetarian: false },
+              { _id: new ObjectId(), name: "Avocado Toast", description: "Toasted bread with smashed avocado and cherry tomatoes", price: 7500, vegetarian: true },
+              { _id: new ObjectId(), name: "Omelette", description: "Three-egg omelette with cheese and mushrooms", price: 8500, vegetarian: true },
+              { _id: new ObjectId(), name: "French Toast", description: "Golden brown with cinnamon sugar", price: 8000, vegetarian: true },
+            ],
+          },
+          {
+            category: CategoryName.Lunch,
+            items: [
+              { _id: new ObjectId(), name: "Club Sandwich", description: "Triple-layer sandwich with fries", price: 9500, vegetarian: false },
+              { _id: new ObjectId(), name: "Caesar Salad", description: "Crisp romaine, parmesan, and dressing", price: 8500, vegetarian: false },
+              { _id: new ObjectId(), name: "Veggie Wrap", description: "Grilled vegetables in tortilla wrap", price: 8000, vegetarian: true },
+              { _id: new ObjectId(), name: "Soup of the Day", description: "Served with bread", price: 7000, vegetarian: true },
+            ],
+          },
+          {
+            category: CategoryName.Appetizers,
+            items: [
+              { _id: new ObjectId(), name: "Garlic Bread", description: "Toasted with garlic butter", price: 4000, vegetarian: true },
+              { _id: new ObjectId(), name: "Buffalo Wings", description: "Spicy chicken wings with dip", price: 8500, vegetarian: false },
+              { _id: new ObjectId(), name: "Mozzarella Sticks", description: "Crispy and cheesy", price: 6500, vegetarian: true },
+            ],
+          },
+          {
+            category: CategoryName.Desserts,
+            items: [
+              { _id: new ObjectId(), name: "Cheesecake", description: "Classic New York style", price: 6000, vegetarian: true },
+              { _id: new ObjectId(), name: "Apple Pie", description: "Served warm with vanilla ice cream", price: 5500, vegetarian: true },
+              { _id: new ObjectId(), name: "Brownie", description: "Rich chocolate brownie with fudge", price: 5000, vegetarian: true },
+            ],
+          },
+          {
+            category: CategoryName.Drinks,
+            items: [
+              { _id: new ObjectId(), name: "Fresh Orange Juice", description: "Squeezed daily", price: 3500, vegetarian: true },
+              { _id: new ObjectId(), name: "Coffee", description: "Bottomless filter coffee", price: 2500, vegetarian: true },
+              { _id: new ObjectId(), name: "Smoothie", description: "Berry blast smoothie", price: 4500, vegetarian: true },
+              { _id: new ObjectId(), name: "Iced Latte", description: "Chilled coffee with milk", price: 4000, vegetarian: true },
             ],
           },
         ],
@@ -68,9 +105,38 @@ export async function seedInitialData(db: Db) {
         name: "Moonlight Eatery",
         menu: [
           {
+            category: CategoryName.Appetizers,
+            items: [
+              { _id: new ObjectId(), name: "Bruschetta", description: "Tomato, basil, olive oil on toasted bread", price: 6000, vegetarian: true },
+              { _id: new ObjectId(), name: "Shrimp Cocktail", description: "Chilled shrimp with cocktail sauce", price: 8500, vegetarian: false },
+              { _id: new ObjectId(), name: "Stuffed Mushrooms", description: "Cheese-filled baked mushrooms", price: 7500, vegetarian: true },
+            ],
+          },
+          {
             category: CategoryName.Dinner,
             items: [
               { _id: new ObjectId(), name: "Steak", description: "Grilled sirloin steak", price: 12000, vegetarian: false },
+              { _id: new ObjectId(), name: "Pasta Primavera", description: "Pasta with seasonal vegetables", price: 10500, vegetarian: true },
+              { _id: new ObjectId(), name: "Grilled Salmon", description: "Served with lemon butter sauce", price: 13500, vegetarian: false },
+              { _id: new ObjectId(), name: "Veggie Burger", description: "Plant-based patty with fresh toppings", price: 9500, vegetarian: true },
+              { _id: new ObjectId(), name: "Chicken Parmesan", description: "Breaded chicken with tomato sauce and cheese", price: 11500, vegetarian: false },
+            ],
+          },
+          {
+            category: CategoryName.Desserts,
+            items: [
+              { _id: new ObjectId(), name: "Chocolate Cake", description: "Rich chocolate cake with ganache", price: 6000, vegetarian: true },
+              { _id: new ObjectId(), name: "Ice Cream Sundae", description: "Three scoops with toppings", price: 5500, vegetarian: true },
+              { _id: new ObjectId(), name: "Tiramisu", description: "Coffee-flavored Italian dessert", price: 7000, vegetarian: true },
+            ],
+          },
+          {
+            category: CategoryName.Drinks,
+            items: [
+              { _id: new ObjectId(), name: "Red Wine", description: "House red, glass", price: 8500, vegetarian: true },
+              { _id: new ObjectId(), name: "White Wine", description: "House white, glass", price: 8500, vegetarian: true },
+              { _id: new ObjectId(), name: "Sparkling Water", description: "Chilled and refreshing", price: 3000, vegetarian: true },
+              { _id: new ObjectId(), name: "Cocktail", description: "Bartender's choice of the day", price: 9500, vegetarian: true },
             ],
           },
         ],
