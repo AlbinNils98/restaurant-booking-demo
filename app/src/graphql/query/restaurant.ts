@@ -9,7 +9,23 @@ query GetAllRestaurants {
 }`
 
 export const GET_AVAILABLE_SITTINGS_QUERY = gql`
-query GetAvailableSittins($restaurantId:ObjectId!, $partySize: Int!) {
+query GetAvailableSittings($restaurantId:ObjectId!, $partySize: Int!) {
   getAvailableSittings(partySize: $partySize, restaurantId: $restaurantId)
+}
+`;
+
+
+export const GET_MENU_QUERY = gql`
+query GetMenu($restaurantId: ObjectId!){
+  getMenu(restaurantId: $restaurantId){
+  category
+  items {
+    _id
+    name
+    description
+    price
+    vegetarian
+  }
+  }
 }
 `;

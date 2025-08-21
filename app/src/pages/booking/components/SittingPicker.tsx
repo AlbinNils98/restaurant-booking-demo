@@ -4,9 +4,9 @@ import TextField from "@mui/material/TextField";
 import dayjs from "dayjs";
 import { useEffect, useState } from 'react';
 import { useQuery } from '@apollo/client';
-import type { GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables } from '../../../generated/graphql';
 import { GET_AVAILABLE_SITTINGS_QUERY } from '../../../graphql/query/restaurant';
 import { useBooking } from '../../../context/Booking';
+import type { GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables } from '../../../generated/graphql';
 
 type SittingPickerProps = {
   onClick: () => void;
@@ -17,7 +17,7 @@ export default function SittingPicker({ onClick }: SittingPickerProps) {
   const [value, setValue] = useState<string | null>(formData.sittingStart || null);
 
 
-  const { data, loading } = useQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GET_AVAILABLE_SITTINGS_QUERY, {
+  const { data, loading } = useQuery<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>(GET_AVAILABLE_SITTINGS_QUERY, {
     variables: {
       restaurantId: formData.restaurantId,
       partySize: formData.partySize

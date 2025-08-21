@@ -1,4 +1,4 @@
-import { QueryResolvers, WeekDays } from '@/generated/graphql';
+import { MenuCategory, QueryResolvers, WeekDays } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
@@ -63,4 +63,11 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
     }
     return results;
   },
+  getMenu: async (_parent, { restaurantId }, { restaurants }) => {
+    const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
+
+    if (!restaurant) throw new GraphQLError("No restaurant found")
+
+    return restaurant?.menu;
+  }
 };

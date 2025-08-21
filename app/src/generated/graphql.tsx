@@ -109,6 +109,7 @@ export type Query = {
   __typename?: 'Query';
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
+  getMenu: Array<MenuCategory>;
   user?: Maybe<User>;
   userByName?: Maybe<User>;
   users: Array<User>;
@@ -117,6 +118,11 @@ export type Query = {
 
 export type QueryGetAvailableSittingsArgs = {
   partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetMenuArgs = {
   restaurantId: Scalars['ObjectId']['input'];
 };
 
@@ -227,13 +233,20 @@ export type GetAllRestaurantsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetAllRestaurantsQuery = { __typename?: 'Query', getAllRestaurants: Array<{ __typename?: 'RestaurantDto', _id: string, name?: string | null }> };
 
-export type GetAvailableSittinsQueryVariables = Exact<{
+export type GetAvailableSittingsQueryVariables = Exact<{
   restaurantId: Scalars['ObjectId']['input'];
   partySize: Scalars['Int']['input'];
 }>;
 
 
-export type GetAvailableSittinsQuery = { __typename?: 'Query', getAvailableSittings: Array<string> };
+export type GetAvailableSittingsQuery = { __typename?: 'Query', getAvailableSittings: Array<string> };
+
+export type GetMenuQueryVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type GetMenuQuery = { __typename?: 'Query', getMenu: Array<{ __typename?: 'MenuCategory', category: string, items: Array<{ __typename?: 'MenuItem', _id: string, name: string, description?: string | null, price: number, vegetarian: boolean }> }> };
 
 
 export const AddReservationDocument = gql`
@@ -333,42 +346,89 @@ export type GetAllRestaurantsQueryHookResult = ReturnType<typeof useGetAllRestau
 export type GetAllRestaurantsLazyQueryHookResult = ReturnType<typeof useGetAllRestaurantsLazyQuery>;
 export type GetAllRestaurantsSuspenseQueryHookResult = ReturnType<typeof useGetAllRestaurantsSuspenseQuery>;
 export type GetAllRestaurantsQueryResult = Apollo.QueryResult<GetAllRestaurantsQuery, GetAllRestaurantsQueryVariables>;
-export const GetAvailableSittinsDocument = gql`
-    query GetAvailableSittins($restaurantId: ObjectId!, $partySize: Int!) {
+export const GetAvailableSittingsDocument = gql`
+    query GetAvailableSittings($restaurantId: ObjectId!, $partySize: Int!) {
   getAvailableSittings(partySize: $partySize, restaurantId: $restaurantId)
 }
     `;
 
 /**
- * __useGetAvailableSittinsQuery__
+ * __useGetAvailableSittingsQuery__
  *
- * To run a query within a React component, call `useGetAvailableSittinsQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetAvailableSittinsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useGetAvailableSittingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetAvailableSittingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useGetAvailableSittinsQuery({
+ * const { data, loading, error } = useGetAvailableSittingsQuery({
  *   variables: {
  *      restaurantId: // value for 'restaurantId'
  *      partySize: // value for 'partySize'
  *   },
  * });
  */
-export function useGetAvailableSittinsQuery(baseOptions: Apollo.QueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables> & ({ variables: GetAvailableSittinsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useGetAvailableSittingsQuery(baseOptions: Apollo.QueryHookOptions<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables> & ({ variables: GetAvailableSittingsQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+        return Apollo.useQuery<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>(GetAvailableSittingsDocument, options);
       }
-export function useGetAvailableSittinsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>) {
+export function useGetAvailableSittingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+          return Apollo.useLazyQuery<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>(GetAvailableSittingsDocument, options);
         }
-export function useGetAvailableSittinsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>) {
+export function useGetAvailableSittingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>) {
           const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>(GetAvailableSittinsDocument, options);
+          return Apollo.useSuspenseQuery<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>(GetAvailableSittingsDocument, options);
         }
-export type GetAvailableSittinsQueryHookResult = ReturnType<typeof useGetAvailableSittinsQuery>;
-export type GetAvailableSittinsLazyQueryHookResult = ReturnType<typeof useGetAvailableSittinsLazyQuery>;
-export type GetAvailableSittinsSuspenseQueryHookResult = ReturnType<typeof useGetAvailableSittinsSuspenseQuery>;
-export type GetAvailableSittinsQueryResult = Apollo.QueryResult<GetAvailableSittinsQuery, GetAvailableSittinsQueryVariables>;
+export type GetAvailableSittingsQueryHookResult = ReturnType<typeof useGetAvailableSittingsQuery>;
+export type GetAvailableSittingsLazyQueryHookResult = ReturnType<typeof useGetAvailableSittingsLazyQuery>;
+export type GetAvailableSittingsSuspenseQueryHookResult = ReturnType<typeof useGetAvailableSittingsSuspenseQuery>;
+export type GetAvailableSittingsQueryResult = Apollo.QueryResult<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>;
+export const GetMenuDocument = gql`
+    query GetMenu($restaurantId: ObjectId!) {
+  getMenu(restaurantId: $restaurantId) {
+    category
+    items {
+      _id
+      name
+      description
+      price
+      vegetarian
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetMenuQuery__
+ *
+ * To run a query within a React component, call `useGetMenuQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMenuQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMenuQuery({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *   },
+ * });
+ */
+export function useGetMenuQuery(baseOptions: Apollo.QueryHookOptions<GetMenuQuery, GetMenuQueryVariables> & ({ variables: GetMenuQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetMenuQuery, GetMenuQueryVariables>(GetMenuDocument, options);
+      }
+export function useGetMenuLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMenuQuery, GetMenuQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetMenuQuery, GetMenuQueryVariables>(GetMenuDocument, options);
+        }
+export function useGetMenuSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMenuQuery, GetMenuQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetMenuQuery, GetMenuQueryVariables>(GetMenuDocument, options);
+        }
+export type GetMenuQueryHookResult = ReturnType<typeof useGetMenuQuery>;
+export type GetMenuLazyQueryHookResult = ReturnType<typeof useGetMenuLazyQuery>;
+export type GetMenuSuspenseQueryHookResult = ReturnType<typeof useGetMenuSuspenseQuery>;
+export type GetMenuQueryResult = Apollo.QueryResult<GetMenuQuery, GetMenuQueryVariables>;

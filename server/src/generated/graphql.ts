@@ -109,6 +109,7 @@ export type Query = {
   __typename?: 'Query';
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
+  getMenu: Array<MenuCategory>;
   user?: Maybe<User>;
   userByName?: Maybe<User>;
   users: Array<User>;
@@ -117,6 +118,11 @@ export type Query = {
 
 export type QueryGetAvailableSittingsArgs = {
   partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetMenuArgs = {
   restaurantId: Scalars['ObjectId']['input'];
 };
 
@@ -422,6 +428,7 @@ export interface ObjectIdScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   getAllRestaurants?: Resolver<Array<ResolversTypes['RestaurantDto']>, ParentType, ContextType>;
   getAvailableSittings?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType, RequireFields<QueryGetAvailableSittingsArgs, 'partySize' | 'restaurantId'>>;
+  getMenu?: Resolver<Array<ResolversTypes['MenuCategory']>, ParentType, ContextType, RequireFields<QueryGetMenuArgs, 'restaurantId'>>;
   user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, '_id'>>;
   userByName?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserByNameArgs, 'name'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
