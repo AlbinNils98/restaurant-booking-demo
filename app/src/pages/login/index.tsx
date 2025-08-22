@@ -1,22 +1,30 @@
-import { Box, Button, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
 import type { SignInMutation, SignInMutationVariables } from '../../generated/graphql';
 import { useMutation } from '@apollo/client';
 import { SIGN_IN_MUTATION } from '../../graphql/mutation/user';
 import { useAuth } from '../../context/Auth';
+import { useNavigate } from 'react-router-dom';
 
 
 const LoginPage = () => {
   const { login } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState<SignInMutationVariables>({
     email: "",
     password: ""
   });
+  const [serverError, setServerError] = useState<string | null>(null);
+
 
   const [signInMutation] = useMutation<SignInMutation, SignInMutationVariables>(SIGN_IN_MUTATION, {
     onCompleted: (data) => {
-      login(data.signIn)
+      login(data.signIn);
+      navigate("/admin");
+    },
+    onError: (errors) => {
+      setServerError(errors.message);
     }
   })
 
@@ -33,6 +41,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setServerError(null);
     if (!validate()) return;
     signInMutation({ variables: formData });
     setFormData({ email: "", password: "" });
@@ -75,6 +84,12 @@ const LoginPage = () => {
           error={!!errors.password}
           helperText={errors.password}
         />
+
+        {serverError && (
+          <Alert severity="error">
+            {serverError}
+          </Alert>
+        )}
 
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
           Send Message

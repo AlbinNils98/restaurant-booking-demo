@@ -3,7 +3,7 @@ import { Typography } from '@mui/material'
 const MenuPortalPage = () => {
   return (
     <>
-      <Typography>Portal menu page</Typography>
+      <Typography>Menus portal page</Typography>
     </>
   )
 }
