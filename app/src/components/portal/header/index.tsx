@@ -1,5 +1,6 @@
-import { Box, Stack, Divider, Typography, Link as MuiLink } from "@mui/material";
+import { Box, Stack, Divider, Typography, Link as MuiLink, Button } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
+import { useAuth } from '../../../context/Auth';
 
 const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
   const location = useLocation();
@@ -37,14 +38,15 @@ const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode
 function HeaderLinks() {
   return (
     <Stack direction="row" spacing={4} alignItems="center">
-      <UnderlineLink to="/menu">Menu</UnderlineLink>
-      <UnderlineLink to="/booking">Book a table</UnderlineLink>
-      <UnderlineLink to="/contact">Contact</UnderlineLink>
+      <UnderlineLink to="/admin/menus">Menu</UnderlineLink>
+      <UnderlineLink to="/admin/restaurants">Restaurants</UnderlineLink>
+      <UnderlineLink to="/admin/reservations">Reservations</UnderlineLink>
     </Stack>
   );
 }
 
-export function Header() {
+export function PortalHeader() {
+  const { logout } = useAuth();
   return (
     <Box bgcolor="grey.900" py={3} color="white" width="100%">
       <Stack direction="row" alignItems="center">
@@ -61,6 +63,24 @@ export function Header() {
         <Box flexGrow={1} />
 
         <HeaderLinks />
+
+        <Button
+          variant="outlined"
+          size="small"
+          onClick={logout}
+          sx={{
+            ml: 3,
+            borderColor: "white",
+            color: "white",
+            "&:hover": {
+              backgroundColor: "white",
+              color: "black",
+              borderColor: "white",
+            },
+          }}
+        >
+          Logout
+        </Button>
       </Stack>
       <Divider sx={{ mt: 2, bgcolor: "grey.600" }} />
     </Box>
@@ -69,4 +89,4 @@ export function Header() {
 
 
 
-export default Header;
+export default PortalHeader;
