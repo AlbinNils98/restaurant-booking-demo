@@ -14,6 +14,7 @@ import MainPortalPage from './pages/portal';
 import PortalHeader from './components/portal/header';
 import RestaurantPortalPage from './pages/portal/restaurant';
 import ReservationPortalPage from './pages/portal/reservation';
+import { ToastProvider } from './context/Toast';
 
 const DefaultLayout = () => {
   return (
@@ -53,24 +54,26 @@ const App = () => {
         <CssBaseline />
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
-              <Route element={<DefaultLayout />}>
-                <Route path="/" element={<HomePage />} />
-                <Route path="/booking" element={<BookingPage />} />
-                <Route path="/menu" element={<MenuPage />} />
-                <Route path="/contact" element={<ContactPage />} />
-                <Route path='/login' element={<LoginPage />} />
-              </Route>
-              <Route path='/admin' element={<ProtectedRoute />} >
-                <Route element={<PortalLayout />}>
-                  <Route index element={<MainPortalPage />} />
-                  <Route path='/admin/menus' element={<MenuPortalPage />} />
-                  <Route path='/admin/restaurants' element={<RestaurantPortalPage />} />
-                  <Route path='/admin/reservations' element={<ReservationPortalPage />} />
+            <ToastProvider>
+              <Routes>
+                <Route element={<DefaultLayout />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/booking" element={<BookingPage />} />
+                  <Route path="/menu" element={<MenuPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path='/login' element={<LoginPage />} />
                 </Route>
-              </Route>
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
+                <Route path='/admin' element={<ProtectedRoute />} >
+                  <Route element={<PortalLayout />}>
+                    <Route index element={<MainPortalPage />} />
+                    <Route path='/admin/menus' element={<MenuPortalPage />} />
+                    <Route path='/admin/restaurants' element={<RestaurantPortalPage />} />
+                    <Route path='/admin/reservations' element={<ReservationPortalPage />} />
+                  </Route>
+                </Route>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </ToastProvider>
           </AuthProvider>
         </BrowserRouter>
       </ThemeProvider>

@@ -92,7 +92,7 @@ const LoginPage = () => {
         )}
 
         <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
-          Send Message
+          Sign In
         </Button>
       </form>
     </Box >

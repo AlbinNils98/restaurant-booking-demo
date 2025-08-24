@@ -16,8 +16,6 @@ export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
     if (price < 0) {
       throw new GraphQLError("Price must be a positive value");
     }
-    //Price in swedish kronor (öre)
-    const priceInOre = Math.round(price * 100);
 
     const newItemId = new ObjectId();
 
@@ -29,7 +27,7 @@ export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
             _id: newItemId,
             name,
             description: description || "",
-            price: priceInOre,
+            price,
             vegetarian
           }
         }
@@ -49,7 +47,7 @@ export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
                 _id: newItemId,
                 name,
                 description: description || "",
-                price: priceInOre,
+                price: price,
                 vegetarian,
               }],
             },
@@ -154,7 +152,7 @@ export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
       ...oldItem,
       ...(name && { name }),
       ...(description && { description }),
-      ...(price && { price: Math.round(price * 100) }),
+      ...(price && { price }),
       vegetarian: vegetarian ?? oldItem.vegetarian,
     };
 
@@ -165,7 +163,7 @@ export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
       const updateFields: any = {};
       if (name) updateFields["menu.$[].items.$[item].name"] = name;
       if (description) updateFields["menu.$[].items.$[item].description"] = description;
-      if (price) updateFields["menu.$[].items.$[item].price"] = Math.round(price * 100);
+      if (price) updateFields["menu.$[].items.$[item].price"] = price;
       if (vegetarian === true || vegetarian === false) {
         updateFields["menu.$[].items.$[item].vegetarian"] = vegetarian;
       }
