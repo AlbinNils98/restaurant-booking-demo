@@ -1,9 +1,11 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { GET_ALL_RESTAURANTS_QUERY, GET_MENU_QUERY } from '../../graphql/query/restaurant';
-import type { GetAllRestaurantsQuery, GetMenuQuery, GetMenuQueryVariables } from '../../generated/graphql';
+import type { GetAllRestaurantsQuery, GetMenuQuery, GetMenuQueryVariables, MenuItem } from '../../generated/graphql';
 import { useEffect, useState } from 'react';
-import RestaurantSelect from './components/RestaurantSelect';
-import { Card, CardContent, Chip, Divider, List, ListItem, ListItemText, Typography } from '@mui/material';
+import RestaurantSelect from '../../components/RestaurantSelect';
+import { Typography } from '@mui/material';
+import { MenuDisplay } from '../../components/menu/MenuDisplay';
+import MenuItemRowView from '../../components/menu/MenuItemRowView';
 
 
 const MenuPage = () => {
@@ -38,52 +40,14 @@ const MenuPage = () => {
         setSelectedRestaurant={setSelectedRestaurant}
       />
 
-      {menu?.getMenu && (
-        <div style={{ marginTop: 24 }}>
-          {menu.getMenu.map((category) => (
-            <Card
-              key={category.category}
-              variant="outlined"
-              style={{ marginBottom: 24 }}
-            >
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  {category.category}
-                </Typography>
-                <Divider style={{ marginBottom: 8 }} />
-
-                <List>
-                  {category.items.map((item) => (
-                    <ListItem key={item._id}>
-                      <ListItemText
-                        primary={
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
-                            <span>{item.name}</span>
-                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                              {item.vegetarian && (
-                                <Chip
-                                  label="Vegetarian"
-                                  size="small"
-                                  color="success"
-                                  variant="outlined"
-                                />
-                              )}
-                              <Typography variant="body2" color="text.secondary">
-                                {(item.price / 100).toFixed(2)} kr
-                              </Typography>
-                            </div>
-                          </div>
-                        }
-                        secondary={item.description}
-                      />
-                    </ListItem>
-                  ))}
-                </List>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <MenuDisplay
+        menu={menu}
+        RowComponent={(props: { item: MenuItem }) => (
+          <MenuItemRowView
+            {...props}
+          />
+        )}
+      />
     </div>
   );
 }

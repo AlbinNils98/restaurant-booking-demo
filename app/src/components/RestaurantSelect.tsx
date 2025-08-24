@@ -1,5 +1,5 @@
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
-import type { GetAllRestaurantsQuery } from '../../../generated/graphql';
+import type { GetAllRestaurantsQuery } from '../generated/graphql';
 import type { Dispatch } from 'react';
 
 type RestaurantSelectProps = {
@@ -20,7 +20,7 @@ const RestaurantSelect = ({ data, selectedRestaurant, setSelectedRestaurant }: R
               labelId="restaurant-label"
               value={selectedRestaurant || data.getAllRestaurants[0]._id}
               onChange={(e) => setSelectedRestaurant(e.target.value)}
-              label="Restaurant" // 👈 this is needed so the outline knows where to cut
+              label="Restaurant"
             >
               {data.getAllRestaurants.map((restaurant) => (
                 <MenuItem key={restaurant._id} value={restaurant._id}>

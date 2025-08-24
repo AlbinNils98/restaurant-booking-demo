@@ -83,7 +83,6 @@ export type MutationAddUserArgs = {
 
 
 export type MutationRemoveMenuItemArgs = {
-  categoryName: CategoryName;
   itemId: Scalars['ObjectId']['input'];
   restaurantId: Scalars['ObjectId']['input'];
 };
@@ -416,7 +415,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationAddMenuItemArgs, 'categoryName' | 'name' | 'price' | 'restaurantId' | 'vegetarian'>>;
   addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'email' | 'firstName' | 'lastName' | 'partySize' | 'restaurantId' | 'sittingStart'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
-  removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'categoryName' | 'itemId' | 'restaurantId'>>;
+  removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
   signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;
 };
