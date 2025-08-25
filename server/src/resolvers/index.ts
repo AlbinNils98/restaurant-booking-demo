@@ -1,5 +1,5 @@
 import type { Resolvers } from "@/generated/graphql";
-import { authResolvers } from '@/resolvers/mutation/signIn';
+import { authMutationResolvers } from '@/resolvers/mutation/auth';
 import { userQueryResolvers } from "@/resolvers/query/user";
 import { reservationMutationResolvers } from '@/resolvers/mutation/reservation';
 import { restaurantMutationResolvers } from '@/resolvers/mutation/restaurant';
@@ -13,7 +13,7 @@ export const resolvers: Resolvers = {
     ...tableQueryResolvers,
   },
   Mutation: {
-    ...authResolvers,
+    ...authMutationResolvers,
     ...reservationMutationResolvers,
     ...restaurantMutationResolvers,
   },

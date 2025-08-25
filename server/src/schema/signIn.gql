@@ -1,4 +1,0 @@
-
-type Mutation {
-  signIn(email: String!, password: String!): String! @public
-}

@@ -14,7 +14,6 @@ export function authDirectiveTransformer(schema: any) {
         return fieldConfig;
       }
 
-      // Wrap resolver to enforce auth
       const { resolve = defaultFieldResolver } = fieldConfig;
       fieldConfig.resolve = async (source, args, context, info) => {
         if (!context.currentUser) {

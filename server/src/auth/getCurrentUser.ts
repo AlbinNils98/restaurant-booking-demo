@@ -1,14 +1,8 @@
-import jwt, {
-  TokenExpiredError,
-  JsonWebTokenError,
-  NotBeforeError,
-} from "jsonwebtoken";
+import jwt, { TokenExpiredError, JsonWebTokenError, NotBeforeError } from "jsonwebtoken";
 import { GraphQLError } from "graphql";
 
-export function getCurrentUser(authHeader: string | null): { _id: string; role: string } | undefined {
-  if (!authHeader?.startsWith("Bearer ")) return;
-
-  const token = authHeader.slice(7);
+export function getCurrentUser(token?: string): { _id: string; role: string } | null {
+  if (!token) return null;
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET!) as {

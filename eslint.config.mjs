@@ -10,7 +10,7 @@ export default defineConfig([
     ignores: [
       "eslint.config.mjs",
       "app/eslint.config.js",
-      "dist/**",
+      "**/dist/**",
       "node_modules/**"
     ],
   },
