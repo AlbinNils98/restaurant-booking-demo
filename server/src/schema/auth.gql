@@ -1,0 +1,8 @@
+type Mutation {
+  signIn(email: String!, password: String!): authRes! @public
+  signOut: authRes! @public
+}
+
+type authRes {
+  success: Boolean!
+}

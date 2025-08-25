@@ -1,48 +1,72 @@
-import { jwtDecode, type JwtPayload } from 'jwt-decode';
-import { createContext, useContext, useState, type ReactNode, useEffect } from "react";
+import { useLazyQuery, useMutation } from '@apollo/client';
+import { createContext, useState, type ReactNode, useEffect, useContext } from "react";
+import { ME_QUERY } from '../graphql/query/user';
+import type { MeQuery, SignOutMutation, UserDto } from '../generated/graphql';
+import { SIGN_OUT_MUTATION } from '../graphql/mutation/auth';
+import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
-  token: string | null;
   isAuthenticated: boolean;
-  login: (token: string) => void;
-  logout: () => void;
+  user: UserDto | null;
+  loading: boolean;
+  login: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType>({
-  token: null,
   isAuthenticated: false,
-  login: () => { },
-  logout: () => { },
+  user: null,
+  loading: true,
+  login: async () => { },
+  logout: async () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [token, setToken] = useState<string | null>(() => localStorage.getItem("jwtToken"));
+  const [user, setUser] = useState<{ _id: string; name: string } | null>(null);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  const login = (newToken: string) => {
-    localStorage.setItem("jwtToken", newToken);
-    setToken(newToken);
+
+  const [getMe] = useLazyQuery<MeQuery>(ME_QUERY, { fetchPolicy: "network-only" });
+  const [signOut] = useMutation<SignOutMutation>(SIGN_OUT_MUTATION);
+
+  const fetchMe = async () => {
+    try {
+      const result = await getMe();
+      if (!result.data?.me) {
+        setUser(null);
+      } else {
+        setUser(result.data.me);
+      }
+    } catch {
+      setUser(null);
+    } finally {
+      setLoading(false);
+      navigate("/admin")
+    }
   };
 
-  const logout = () => {
-    localStorage.removeItem("jwtToken");
-    setToken(null);
+  const login = async () => {
+    await fetchMe();
+  };
+
+  const logout = async () => {
+    try {
+      await signOut();
+      setUser(null);
+    } catch (err) {
+      console.error("Logout failed", err);
+    }
   };
 
   useEffect(() => {
-    if (token) {
-      try {
-        const { exp } = jwtDecode<JwtPayload>(token);
-        if (!exp || exp < Date.now() / 1000) logout();
-      } catch {
-        logout();
-      }
-    }
-  }, [token]);
+    fetchMe();
+  }, []);
 
   return (
-    <AuthContext.Provider value={{ token, isAuthenticated: !!token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated: !!user, user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

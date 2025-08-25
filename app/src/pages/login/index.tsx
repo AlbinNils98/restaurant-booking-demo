@@ -1,14 +1,14 @@
 import { Alert, Box, Button, TextField, Typography } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { SignInMutation, SignInMutationVariables } from '../../generated/graphql';
 import { useMutation } from '@apollo/client';
-import { SIGN_IN_MUTATION } from '../../graphql/mutation/user';
 import { useAuth } from '../../context/Auth';
+import { SIGN_IN_MUTATION } from '../../graphql/mutation/auth';
 import { useNavigate } from 'react-router-dom';
 
 
 const LoginPage = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState<SignInMutationVariables>({
@@ -19,16 +19,21 @@ const LoginPage = () => {
 
 
   const [signInMutation] = useMutation<SignInMutation, SignInMutationVariables>(SIGN_IN_MUTATION, {
-    onCompleted: (data) => {
-      login(data.signIn);
-      navigate("/admin");
+    onCompleted: () => {
+      login();
     },
     onError: (errors) => {
       setServerError(errors.message);
     }
-  })
+  });
 
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/admin");
+    }
+  }, [isAuthenticated, navigate]);
 
   const validate = () => {
     const newErrors: typeof errors = {};

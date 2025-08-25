@@ -49,7 +49,8 @@ export type Mutation = {
   addReservation: Reservation;
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
-  signIn: Scalars['String']['output'];
+  signIn: AuthRes;
+  signOut: AuthRes;
   updateMenuItem: MenuItem;
 };
 
@@ -109,7 +110,7 @@ export type Query = {
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
   getMenu: Array<MenuCategory>;
-  user?: Maybe<User>;
+  me: UserDto;
   userByName?: Maybe<User>;
   users: Array<User>;
 };
@@ -123,11 +124,6 @@ export type QueryGetAvailableSittingsArgs = {
 
 export type QueryGetMenuArgs = {
   restaurantId: Scalars['ObjectId']['input'];
-};
-
-
-export type QueryUserArgs = {
-  _id: Scalars['ObjectId']['input'];
 };
 
 
@@ -204,6 +200,12 @@ export type User = {
   role: Role;
 };
 
+export type UserDto = {
+  __typename?: 'UserDto';
+  _id: Scalars['ObjectId']['output'];
+  name: Scalars['String']['output'];
+};
+
 export enum WeekDays {
   Friday = 'FRIDAY',
   Monday = 'MONDAY',
@@ -213,6 +215,11 @@ export enum WeekDays {
   Tuesday = 'TUESDAY',
   Wednesday = 'WEDNESDAY'
 }
+
+export type AuthRes = {
+  __typename?: 'authRes';
+  success: Scalars['Boolean']['output'];
+};
 
 export type AdditionalEntityFields = {
   path?: InputMaybe<Scalars['String']['input']>;
@@ -309,7 +316,9 @@ export type ResolversTypes = {
   Table: ResolverTypeWrapper<Table>;
   TableDto: ResolverTypeWrapper<TableDto>;
   User: ResolverTypeWrapper<User>;
+  UserDto: ResolverTypeWrapper<UserDto>;
   WeekDays: WeekDays;
+  authRes: ResolverTypeWrapper<AuthRes>;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
@@ -332,6 +341,8 @@ export type ResolversParentTypes = {
   Table: Table;
   TableDto: TableDto;
   User: User;
+  UserDto: UserDto;
+  authRes: AuthRes;
   AdditionalEntityFields: AdditionalEntityFields;
 };
 
@@ -416,7 +427,8 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'email' | 'firstName' | 'lastName' | 'partySize' | 'restaurantId' | 'sittingStart'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
-  signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
+  signIn?: Resolver<ResolversTypes['authRes'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
+  signOut?: Resolver<ResolversTypes['authRes'], ParentType, ContextType>;
   updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;
 };
 
@@ -428,7 +440,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getAllRestaurants?: Resolver<Array<ResolversTypes['RestaurantDto']>, ParentType, ContextType>;
   getAvailableSittings?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType, RequireFields<QueryGetAvailableSittingsArgs, 'partySize' | 'restaurantId'>>;
   getMenu?: Resolver<Array<ResolversTypes['MenuCategory']>, ParentType, ContextType, RequireFields<QueryGetMenuArgs, 'restaurantId'>>;
-  user?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserArgs, '_id'>>;
+  me?: Resolver<ResolversTypes['UserDto'], ParentType, ContextType>;
   userByName?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserByNameArgs, 'name'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
 };
@@ -497,6 +509,17 @@ export type UserResolvers<ContextType = any, ParentType extends ResolversParentT
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type UserDtoResolvers<ContextType = any, ParentType extends ResolversParentTypes['UserDto'] = ResolversParentTypes['UserDto']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type AuthResResolvers<ContextType = any, ParentType extends ResolversParentTypes['authRes'] = ResolversParentTypes['authRes']> = {
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type Resolvers<ContextType = any> = {
   DateTime?: GraphQLScalarType;
   MenuCategory?: MenuCategoryResolvers<ContextType>;
@@ -511,6 +534,8 @@ export type Resolvers<ContextType = any> = {
   Table?: TableResolvers<ContextType>;
   TableDto?: TableDtoResolvers<ContextType>;
   User?: UserResolvers<ContextType>;
+  UserDto?: UserDtoResolvers<ContextType>;
+  authRes?: AuthResResolvers<ContextType>;
 };
 
 export type DirectiveResolvers<ContextType = any> = {

@@ -8,13 +8,18 @@ type User {
   _id: ObjectId!
   name: String!
   email: String!
-  password: String! # hashed and private
+  password: String!
   role: Role!
 }
 
+type UserDto {
+  _id: ObjectId!
+  name: String!
+}
+
 type Query {
-  user(_id: ObjectId!): User
-  users: [User!]! @public
+  me: UserDto!
+  users: [User!]!
   userByName(name: String!): User
 }
 
