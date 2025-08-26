@@ -9,6 +9,8 @@ query GetTables($restaurantId: ObjectId!) {
     seats
     createdAt
     updatedAt
+    removed
+    removedAt
   }
 }
 `;

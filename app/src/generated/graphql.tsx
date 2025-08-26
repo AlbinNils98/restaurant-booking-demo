@@ -49,10 +49,12 @@ export type Mutation = {
   addReservation: Reservation;
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
+  removeTable: Table;
   signIn: AuthRes;
   signOut: AuthRes;
   updateMenuItem: MenuItem;
   updateRestaurant: Restaurant;
+  updateTable: Table;
 };
 
 
@@ -90,6 +92,11 @@ export type MutationRemoveMenuItemArgs = {
 };
 
 
+export type MutationRemoveTableArgs = {
+  tableId: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationSignInArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -114,6 +121,13 @@ export type MutationUpdateRestaurantArgs = {
   openingHours?: InputMaybe<OpeningHoursInput>;
   restaurantId: Scalars['ObjectId']['input'];
   sittings?: InputMaybe<Array<SittingInput>>;
+};
+
+
+export type MutationUpdateTableArgs = {
+  name?: InputMaybe<Scalars['String']['input']>;
+  seats?: InputMaybe<Scalars['Int']['input']>;
+  tableId: Scalars['ObjectId']['input'];
 };
 
 export type OpeningHours = {
@@ -218,16 +232,11 @@ export type Table = {
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
   name: Scalars['String']['output'];
+  removed?: Maybe<Scalars['Boolean']['output']>;
+  removedAt?: Maybe<Scalars['DateTime']['output']>;
   restaurantId: Scalars['ObjectId']['output'];
   seats: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
-};
-
-export type TableDto = {
-  __typename?: 'TableDto';
-  _id: Scalars['ObjectId']['output'];
-  availableDates: Array<Scalars['DateTime']['output']>;
-  restaurantId: Scalars['ObjectId']['output'];
 };
 
 export type User = {
@@ -331,6 +340,22 @@ export type UpdateRestaurantMutationVariables = Exact<{
 
 export type UpdateRestaurantMutation = { __typename?: 'Mutation', updateRestaurant: { __typename?: 'Restaurant', _id: string, name: string, adress: string, openingDays: Array<WeekDays>, openingHours: { __typename?: 'OpeningHours', open: string, close: string }, sittings: Array<{ __typename?: 'Sitting', startTime: string, durationMinutes: number }> } };
 
+export type UpdateTableMutationVariables = Exact<{
+  tableId: Scalars['ObjectId']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  seats?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type UpdateTableMutation = { __typename?: 'Mutation', updateTable: { __typename?: 'Table', _id: string } };
+
+export type RemoveTableMutationVariables = Exact<{
+  tableId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type RemoveTableMutation = { __typename?: 'Mutation', removeTable: { __typename?: 'Table', _id: string } };
+
 export type GetAllRestaurantsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -356,7 +381,7 @@ export type GetTablesQueryVariables = Exact<{
 }>;
 
 
-export type GetTablesQuery = { __typename?: 'Query', getTables: Array<{ __typename?: 'Table', _id: string, restaurantId: string, name: string, seats: number, createdAt: string, updatedAt: string }> };
+export type GetTablesQuery = { __typename?: 'Query', getTables: Array<{ __typename?: 'Table', _id: string, restaurantId: string, name: string, seats: number, createdAt: string, updatedAt: string, removed?: boolean | null, removedAt?: string | null }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -675,6 +700,74 @@ export function useUpdateRestaurantMutation(baseOptions?: Apollo.MutationHookOpt
 export type UpdateRestaurantMutationHookResult = ReturnType<typeof useUpdateRestaurantMutation>;
 export type UpdateRestaurantMutationResult = Apollo.MutationResult<UpdateRestaurantMutation>;
 export type UpdateRestaurantMutationOptions = Apollo.BaseMutationOptions<UpdateRestaurantMutation, UpdateRestaurantMutationVariables>;
+export const UpdateTableDocument = gql`
+    mutation UpdateTable($tableId: ObjectId!, $name: String, $seats: Int) {
+  updateTable(tableId: $tableId, name: $name, seats: $seats) {
+    _id
+  }
+}
+    `;
+export type UpdateTableMutationFn = Apollo.MutationFunction<UpdateTableMutation, UpdateTableMutationVariables>;
+
+/**
+ * __useUpdateTableMutation__
+ *
+ * To run a mutation, you first call `useUpdateTableMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateTableMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateTableMutation, { data, loading, error }] = useUpdateTableMutation({
+ *   variables: {
+ *      tableId: // value for 'tableId'
+ *      name: // value for 'name'
+ *      seats: // value for 'seats'
+ *   },
+ * });
+ */
+export function useUpdateTableMutation(baseOptions?: Apollo.MutationHookOptions<UpdateTableMutation, UpdateTableMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateTableMutation, UpdateTableMutationVariables>(UpdateTableDocument, options);
+      }
+export type UpdateTableMutationHookResult = ReturnType<typeof useUpdateTableMutation>;
+export type UpdateTableMutationResult = Apollo.MutationResult<UpdateTableMutation>;
+export type UpdateTableMutationOptions = Apollo.BaseMutationOptions<UpdateTableMutation, UpdateTableMutationVariables>;
+export const RemoveTableDocument = gql`
+    mutation RemoveTable($tableId: ObjectId!) {
+  removeTable(tableId: $tableId) {
+    _id
+  }
+}
+    `;
+export type RemoveTableMutationFn = Apollo.MutationFunction<RemoveTableMutation, RemoveTableMutationVariables>;
+
+/**
+ * __useRemoveTableMutation__
+ *
+ * To run a mutation, you first call `useRemoveTableMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveTableMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeTableMutation, { data, loading, error }] = useRemoveTableMutation({
+ *   variables: {
+ *      tableId: // value for 'tableId'
+ *   },
+ * });
+ */
+export function useRemoveTableMutation(baseOptions?: Apollo.MutationHookOptions<RemoveTableMutation, RemoveTableMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveTableMutation, RemoveTableMutationVariables>(RemoveTableDocument, options);
+      }
+export type RemoveTableMutationHookResult = ReturnType<typeof useRemoveTableMutation>;
+export type RemoveTableMutationResult = Apollo.MutationResult<RemoveTableMutation>;
+export type RemoveTableMutationOptions = Apollo.BaseMutationOptions<RemoveTableMutation, RemoveTableMutationVariables>;
 export const GetAllRestaurantsDocument = gql`
     query GetAllRestaurants {
   getAllRestaurants {
@@ -820,6 +913,8 @@ export const GetTablesDocument = gql`
     seats
     createdAt
     updatedAt
+    removed
+    removedAt
   }
 }
     `;

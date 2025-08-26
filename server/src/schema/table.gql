@@ -1,4 +1,16 @@
 
+type Mutation {
+  updateTable(
+    tableId: ObjectId!
+    name: String
+    seats: Int
+    ): Table!
+
+    removeTable(tableId: ObjectId!): Table!
+
+    undoRemoval(tableId: ObjectId!): Table!
+}
+
 type Query {
   getTables(restaurantId: ObjectId!): [Table!]!
 }
@@ -11,10 +23,6 @@ type Table {
   seats: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
-}
-
-type TableDto {
-  _id: ObjectId!
-  restaurantId: ObjectId!
-  availableDates: [DateTime!]!
+  removedAt: DateTime
+  removed: Boolean
 }

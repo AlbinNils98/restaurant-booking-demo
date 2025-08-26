@@ -1,0 +1,46 @@
+import { Button, Card, CardContent, Divider, Stack, Typography } from '@mui/material';
+import type { GetTablesQuery, GetTablesQueryVariables } from '../../../../generated/graphql';
+import { useLazyQuery } from '@apollo/client';
+import { GET_TABLES_QUERY } from '../../../../graphql/query/tables';
+import { useEffect } from 'react';
+import TableItemEdit from './TableItemEdit';
+
+type TableEditProps = {
+  selectedRestaurant: string;
+}
+
+const TableEdit = ({ selectedRestaurant }: TableEditProps) => {
+
+  const [getTables, { data: tables }] = useLazyQuery<GetTablesQuery, GetTablesQueryVariables>(GET_TABLES_QUERY);
+
+  useEffect(() => {
+    if (selectedRestaurant) {
+      getTables({ variables: { restaurantId: selectedRestaurant } });
+    }
+  }, [selectedRestaurant]);
+
+  const handleAdd = () => {
+
+  }
+
+  return (
+    <Card variant="outlined" sx={{ mb: 3 }}>
+      <CardContent>
+        <Stack direction="row" justifyContent="space-between">
+          <Typography variant="h6" gutterBottom>
+            Tables
+          </Typography>
+          <Button variant='outlined' onClick={handleAdd}>Add Table</Button>
+        </Stack>
+        <Divider sx={{ mb: 2, mt: 2 }} />
+        <Stack spacing={1}>
+          {tables?.getTables.map((table) => (
+            <TableItemEdit key={table._id} table={table} />
+          ))}
+        </Stack>
+      </CardContent>
+    </Card>
+  )
+}
+
+export default TableEdit;

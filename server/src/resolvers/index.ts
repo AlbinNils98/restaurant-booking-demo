@@ -5,6 +5,7 @@ import { reservationMutationResolvers } from '@/resolvers/mutation/reservation';
 import { restaurantMutationResolvers } from '@/resolvers/mutation/restaurant';
 import { restaurantQueryResolvers } from './query/restaurant';
 import { tableQueryResolvers } from './query/table';
+import { tableMutationResolvers } from './mutation/table';
 
 export const resolvers: Resolvers = {
   Query: {
@@ -16,5 +17,7 @@ export const resolvers: Resolvers = {
     ...authMutationResolvers,
     ...reservationMutationResolvers,
     ...restaurantMutationResolvers,
+    ...tableMutationResolvers,
+
   },
 };
