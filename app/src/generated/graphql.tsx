@@ -52,6 +52,7 @@ export type Mutation = {
   signIn: AuthRes;
   signOut: AuthRes;
   updateMenuItem: MenuItem;
+  updateRestaurant: Restaurant;
 };
 
 
@@ -105,11 +106,33 @@ export type MutationUpdateMenuItemArgs = {
   vegetarian?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
+
+export type MutationUpdateRestaurantArgs = {
+  adress?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  openingDays?: InputMaybe<Array<WeekDays>>;
+  openingHours?: InputMaybe<OpeningHoursInput>;
+  restaurantId: Scalars['ObjectId']['input'];
+  sittings?: InputMaybe<Array<SittingInput>>;
+};
+
+export type OpeningHours = {
+  __typename?: 'OpeningHours';
+  close: Scalars['String']['output'];
+  open: Scalars['String']['output'];
+};
+
+export type OpeningHoursInput = {
+  close: Scalars['String']['input'];
+  open: Scalars['String']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
   getMenu: Array<MenuCategory>;
+  getTables: Array<Table>;
   me: UserDto;
   userByName?: Maybe<User>;
   users: Array<User>;
@@ -123,6 +146,11 @@ export type QueryGetAvailableSittingsArgs = {
 
 
 export type QueryGetMenuArgs = {
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetTablesArgs = {
   restaurantId: Scalars['ObjectId']['input'];
 };
 
@@ -151,16 +179,22 @@ export type Reservation = {
 export type Restaurant = {
   __typename?: 'Restaurant';
   _id: Scalars['ObjectId']['output'];
+  adress: Scalars['String']['output'];
   menu: Array<MenuCategory>;
   name: Scalars['String']['output'];
   openingDays: Array<WeekDays>;
+  openingHours: OpeningHours;
   sittings: Array<Sitting>;
 };
 
 export type RestaurantDto = {
   __typename?: 'RestaurantDto';
   _id: Scalars['ObjectId']['output'];
+  adress: Scalars['String']['output'];
   name?: Maybe<Scalars['String']['output']>;
+  openingDays: Array<WeekDays>;
+  openingHours: OpeningHours;
+  sittings: Array<Sitting>;
 };
 
 export enum Role {
@@ -172,6 +206,11 @@ export type Sitting = {
   __typename?: 'Sitting';
   durationMinutes: Scalars['Int']['output'];
   startTime: Scalars['String']['output'];
+};
+
+export type SittingInput = {
+  durationMinutes: Scalars['Int']['input'];
+  startTime: Scalars['String']['input'];
 };
 
 export type Table = {
@@ -280,10 +319,22 @@ export type AddMenuItemMutationVariables = Exact<{
 
 export type AddMenuItemMutation = { __typename?: 'Mutation', addMenuItem: { __typename?: 'MenuItem', _id: string, name: string, description?: string | null, price: number, vegetarian: boolean } };
 
+export type UpdateRestaurantMutationVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  adress?: InputMaybe<Scalars['String']['input']>;
+  openingDays?: InputMaybe<Array<WeekDays> | WeekDays>;
+  openingHours?: InputMaybe<OpeningHoursInput>;
+  sittings?: InputMaybe<Array<SittingInput> | SittingInput>;
+}>;
+
+
+export type UpdateRestaurantMutation = { __typename?: 'Mutation', updateRestaurant: { __typename?: 'Restaurant', _id: string, name: string, adress: string, openingDays: Array<WeekDays>, openingHours: { __typename?: 'OpeningHours', open: string, close: string }, sittings: Array<{ __typename?: 'Sitting', startTime: string, durationMinutes: number }> } };
+
 export type GetAllRestaurantsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllRestaurantsQuery = { __typename?: 'Query', getAllRestaurants: Array<{ __typename?: 'RestaurantDto', _id: string, name?: string | null }> };
+export type GetAllRestaurantsQuery = { __typename?: 'Query', getAllRestaurants: Array<{ __typename?: 'RestaurantDto', _id: string, name?: string | null, adress: string, openingDays: Array<WeekDays>, openingHours: { __typename?: 'OpeningHours', open: string, close: string }, sittings: Array<{ __typename?: 'Sitting', startTime: string, durationMinutes: number }> }> };
 
 export type GetAvailableSittingsQueryVariables = Exact<{
   restaurantId: Scalars['ObjectId']['input'];
@@ -299,6 +350,13 @@ export type GetMenuQueryVariables = Exact<{
 
 
 export type GetMenuQuery = { __typename?: 'Query', getMenu: Array<{ __typename?: 'MenuCategory', category: string, items: Array<{ __typename?: 'MenuItem', _id: string, name: string, description?: string | null, price: number, vegetarian: boolean }> }> };
+
+export type GetTablesQueryVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type GetTablesQuery = { __typename?: 'Query', getTables: Array<{ __typename?: 'Table', _id: string, restaurantId: string, name: string, seats: number, createdAt: string, updatedAt: string }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -561,11 +619,77 @@ export function useAddMenuItemMutation(baseOptions?: Apollo.MutationHookOptions<
 export type AddMenuItemMutationHookResult = ReturnType<typeof useAddMenuItemMutation>;
 export type AddMenuItemMutationResult = Apollo.MutationResult<AddMenuItemMutation>;
 export type AddMenuItemMutationOptions = Apollo.BaseMutationOptions<AddMenuItemMutation, AddMenuItemMutationVariables>;
+export const UpdateRestaurantDocument = gql`
+    mutation UpdateRestaurant($restaurantId: ObjectId!, $name: String, $adress: String, $openingDays: [WeekDays!], $openingHours: OpeningHoursInput, $sittings: [SittingInput!]) {
+  updateRestaurant(
+    restaurantId: $restaurantId
+    name: $name
+    adress: $adress
+    openingDays: $openingDays
+    openingHours: $openingHours
+    sittings: $sittings
+  ) {
+    _id
+    name
+    adress
+    openingDays
+    openingHours {
+      open
+      close
+    }
+    sittings {
+      startTime
+      durationMinutes
+    }
+  }
+}
+    `;
+export type UpdateRestaurantMutationFn = Apollo.MutationFunction<UpdateRestaurantMutation, UpdateRestaurantMutationVariables>;
+
+/**
+ * __useUpdateRestaurantMutation__
+ *
+ * To run a mutation, you first call `useUpdateRestaurantMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateRestaurantMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateRestaurantMutation, { data, loading, error }] = useUpdateRestaurantMutation({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *      name: // value for 'name'
+ *      adress: // value for 'adress'
+ *      openingDays: // value for 'openingDays'
+ *      openingHours: // value for 'openingHours'
+ *      sittings: // value for 'sittings'
+ *   },
+ * });
+ */
+export function useUpdateRestaurantMutation(baseOptions?: Apollo.MutationHookOptions<UpdateRestaurantMutation, UpdateRestaurantMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateRestaurantMutation, UpdateRestaurantMutationVariables>(UpdateRestaurantDocument, options);
+      }
+export type UpdateRestaurantMutationHookResult = ReturnType<typeof useUpdateRestaurantMutation>;
+export type UpdateRestaurantMutationResult = Apollo.MutationResult<UpdateRestaurantMutation>;
+export type UpdateRestaurantMutationOptions = Apollo.BaseMutationOptions<UpdateRestaurantMutation, UpdateRestaurantMutationVariables>;
 export const GetAllRestaurantsDocument = gql`
     query GetAllRestaurants {
   getAllRestaurants {
     _id
     name
+    adress
+    openingDays
+    openingHours {
+      open
+      close
+    }
+    sittings {
+      startTime
+      durationMinutes
+    }
   }
 }
     `;
@@ -687,6 +811,51 @@ export type GetMenuQueryHookResult = ReturnType<typeof useGetMenuQuery>;
 export type GetMenuLazyQueryHookResult = ReturnType<typeof useGetMenuLazyQuery>;
 export type GetMenuSuspenseQueryHookResult = ReturnType<typeof useGetMenuSuspenseQuery>;
 export type GetMenuQueryResult = Apollo.QueryResult<GetMenuQuery, GetMenuQueryVariables>;
+export const GetTablesDocument = gql`
+    query GetTables($restaurantId: ObjectId!) {
+  getTables(restaurantId: $restaurantId) {
+    _id
+    restaurantId
+    name
+    seats
+    createdAt
+    updatedAt
+  }
+}
+    `;
+
+/**
+ * __useGetTablesQuery__
+ *
+ * To run a query within a React component, call `useGetTablesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTablesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTablesQuery({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *   },
+ * });
+ */
+export function useGetTablesQuery(baseOptions: Apollo.QueryHookOptions<GetTablesQuery, GetTablesQueryVariables> & ({ variables: GetTablesQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTablesQuery, GetTablesQueryVariables>(GetTablesDocument, options);
+      }
+export function useGetTablesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTablesQuery, GetTablesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTablesQuery, GetTablesQueryVariables>(GetTablesDocument, options);
+        }
+export function useGetTablesSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTablesQuery, GetTablesQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTablesQuery, GetTablesQueryVariables>(GetTablesDocument, options);
+        }
+export type GetTablesQueryHookResult = ReturnType<typeof useGetTablesQuery>;
+export type GetTablesLazyQueryHookResult = ReturnType<typeof useGetTablesLazyQuery>;
+export type GetTablesSuspenseQueryHookResult = ReturnType<typeof useGetTablesSuspenseQuery>;
+export type GetTablesQueryResult = Apollo.QueryResult<GetTablesQuery, GetTablesQueryVariables>;
 export const MeDocument = gql`
     query me {
   me {

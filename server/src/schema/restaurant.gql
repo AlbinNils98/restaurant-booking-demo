@@ -1,5 +1,14 @@
 
 type Mutation {
+  updateRestaurant(
+    restaurantId: ObjectId!,
+    name: String,
+    adress: String,
+    openingDays: [WeekDays!],
+    openingHours: OpeningHoursInput,
+    sittings: [SittingInput!]
+  ):Restaurant!
+
   addMenuItem(
     restaurantId: ObjectId!, 
     categoryName: CategoryName!,
@@ -31,15 +40,36 @@ type Query {
     getAvailableSittings(restaurantId: ObjectId!, partySize: Int!): [DateTime!]! @public
 }
 
+input OpeningHoursInput {
+  open: String!
+  close: String!
+}
+
+input SittingInput {
+  startTime: String!
+  durationMinutes: Int!
+}
+
 type RestaurantDto {
   _id: ObjectId!,
   name: String,
+  adress: String!
+  openingDays: [WeekDays!]!
+  openingHours: OpeningHours!
+  sittings: [Sitting!]!
+}
+
+type OpeningHours {
+  open: String!,
+  close: String!
 }
 
 type Restaurant {
   _id: ObjectId!
   name: String!
+  adress: String!
   openingDays: [WeekDays!]!
+  openingHours: OpeningHours!
   sittings: [Sitting!]!
   menu: [MenuCategory!]!
 }

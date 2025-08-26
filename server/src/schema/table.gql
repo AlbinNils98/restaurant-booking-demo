@@ -1,4 +1,9 @@
 
+type Query {
+  getTables(restaurantId: ObjectId!): [Table!]!
+}
+
+
 type Table {
   _id: ObjectId!
   restaurantId: ObjectId!

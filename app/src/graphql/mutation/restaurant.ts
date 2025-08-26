@@ -63,3 +63,36 @@ $vegetarian: Boolean!){
   }
 }
 `;
+
+export const UPDATE_RESTAURANT_MUTATION = gql`
+mutation UpdateRestaurant(
+  $restaurantId: ObjectId!,
+  $name: String,
+  $adress: String,
+  $openingDays: [WeekDays!],
+  $openingHours: OpeningHoursInput,
+  $sittings: [SittingInput!]
+) {
+  updateRestaurant(
+    restaurantId: $restaurantId,
+    name: $name,
+    adress: $adress,
+    openingDays: $openingDays,
+    openingHours: $openingHours,
+    sittings: $sittings
+  ) {
+    _id
+    name
+    adress
+    openingDays
+    openingHours {
+      open
+      close
+    }
+    sittings {
+      startTime
+      durationMinutes
+    }
+  }
+}
+`;

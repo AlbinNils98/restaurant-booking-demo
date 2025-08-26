@@ -3,7 +3,6 @@ import { createContext, useState, type ReactNode, useEffect, useContext } from "
 import { ME_QUERY } from '../graphql/query/user';
 import type { MeQuery, SignOutMutation, UserDto } from '../generated/graphql';
 import { SIGN_OUT_MUTATION } from '../graphql/mutation/auth';
-import { useNavigate } from 'react-router-dom';
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -26,8 +25,6 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<{ _id: string; name: string } | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-
 
   const [getMe] = useLazyQuery<MeQuery>(ME_QUERY, { fetchPolicy: "network-only" });
   const [signOut] = useMutation<SignOutMutation>(SIGN_OUT_MUTATION);
@@ -44,7 +41,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(null);
     } finally {
       setLoading(false);
-      navigate("/admin")
     }
   };
 

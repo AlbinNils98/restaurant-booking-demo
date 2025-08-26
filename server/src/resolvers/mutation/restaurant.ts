@@ -1,4 +1,4 @@
-import { MutationResolvers } from '@/generated/graphql';
+import { MutationResolvers, OpeningHours, RestaurantDto, WeekDays } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
@@ -6,6 +6,38 @@ import { it } from 'node:test';
 
 
 export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
+  updateRestaurant: async (_, {
+    restaurantId,
+    name,
+    adress,
+    openingDays,
+    openingHours,
+    sittings
+  },
+    { restaurants }
+  ) => {
+    const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
+    if (!restaurant) throw new GraphQLError("Restaurant not found");
+
+    const update = {
+      ...(name && { name }),
+      ...(adress! && { adress }),
+      ...(openingDays && { openingDays }),
+      ...(openingHours && { openingHours }),
+      ...(sittings && { sittings }),
+    };
+
+    const result = await restaurants.findOneAndUpdate(
+      { _id: new ObjectId(restaurantId) },
+      { $set: update },
+      { returnDocument: "after" }
+    );
+
+    if (!result) throw new GraphQLError("Failed to update restaurant");
+
+    return result;
+  },
+
   addMenuItem: async (_parent, { restaurantId, categoryName, name, description, price, vegetarian }, { restaurants }) => {
 
     const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
