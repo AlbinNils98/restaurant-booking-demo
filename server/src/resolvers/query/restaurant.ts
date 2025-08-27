@@ -1,3 +1,4 @@
+import { TABLE_TTL_DAYS } from '@/constants/constants';
 import { MenuCategory, QueryResolvers, WeekDays } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
@@ -79,7 +80,22 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
         );
 
         const takenTableIds = new Set(overlaps.map(r => r.tableId.toString()));
-        const freeTables = validTables.filter(t => !takenTableIds.has(t._id.toString()));
+
+        const freeTables = validTables.filter(t => {
+          if (t.removedAt) {
+            // TTL removes table 30 days after removedAt
+            const expiry = new Date(t.removedAt);
+            expiry.setDate(expiry.getDate() + TABLE_TTL_DAYS);
+            expiry.setHours(0, 0, 0, 0);
+
+            // cutoff is the day before expiry
+            if (startTime >= expiry) {
+              return false;
+            }
+          }
+
+          return !takenTableIds.has(t._id.toString());
+        });
 
         if (freeTables.length > 0) {
           results.push(startTime)

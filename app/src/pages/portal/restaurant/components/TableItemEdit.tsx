@@ -1,10 +1,10 @@
 import { Box, Button, Chip, IconButton, Stack, TextField, Typography } from '@mui/material';
-import type { RemoveTableMutation, RemoveTableMutationVariables, Table, UpdateTableMutation, UpdateTableMutationVariables } from '../../../../generated/graphql';
+import type { RemoveTableMutation, RemoveTableMutationVariables, Table, UndoTableRemovalMutation, UndoTableRemovalMutationVariables, UpdateTableMutation, UpdateTableMutationVariables } from '../../../../generated/graphql';
 import { useState } from 'react';
 import { DeleteOutline, UndoOutlined } from '@mui/icons-material';
 import ConfirmDialog from '../../../../components/Dialog';
 import { useMutation } from '@apollo/client';
-import { REMOVE_TABLE_MUTATION, UPDATE_TABLE_MUTATION } from '../../../../graphql/mutation/table';
+import { REMOVE_TABLE_MUTATION, UNDO_TABLE_REMOVAL_MUTATION, UPDATE_TABLE_MUTATION } from '../../../../graphql/mutation/table';
 import { GET_TABLES_QUERY } from '../../../../graphql/query/tables';
 
 type TableItemEditProps = {
@@ -15,6 +15,7 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
   const [edit, setEdit] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
+  const [showUndoDialog, setShowUndoDialog] = useState(false);
 
   const [tableData, setTableData] = useState<UpdateTableMutationVariables>({
     tableId: table._id
@@ -36,8 +37,15 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
         { query: GET_TABLES_QUERY, variables: { restaurantId: table.restaurantId } },
       ],
     }
-
   );
+
+  const [undoTableRemoval] = useMutation<UndoTableRemovalMutation, UndoTableRemovalMutationVariables>(UNDO_TABLE_REMOVAL_MUTATION,
+    {
+      variables: { tableId: table._id },
+      refetchQueries: [
+        { query: GET_TABLES_QUERY, variables: { restaurantId: table.restaurantId } },
+      ],
+    });
 
   const toggleEdit = () => {
     setEdit(!edit);
@@ -50,20 +58,16 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
     })
   };
 
-  const handleSave = () => {
-    setShowSaveDialog(true)
-  };
-
-  const handleRemove = () => {
-    setShowRemoveDialog(true)
-  };
-
   const save = () => {
     updateTable({ variables: tableData })
   };
 
   const remove = () => {
     removeTable();
+  };
+
+  const undo = () => {
+    undoTableRemoval();
   };
 
   return (
@@ -98,19 +102,23 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
           }
         </Box>
         <Stack direction="row" gap={1}>
-          {(!edit && table.removedAt) && <IconButton>
-            <UndoOutlined />
-          </IconButton>}
-          {edit && <Button variant='outlined' onClick={handleSave}>Save</Button>}
+          {(!edit && table.removedAt) &&
+            <IconButton onClick={() => setShowUndoDialog(true)}>
+              <UndoOutlined />
+            </IconButton>
+          }
+          {edit && <Button variant='outlined' onClick={() => setShowSaveDialog(true)}>Save</Button>}
           <Button variant='outlined' onClick={toggleEdit}>{edit ? "Abort" : "Edit"}</Button>
           {(!edit && !table.removedAt) &&
-            <IconButton onClick={handleRemove}>
+            <IconButton onClick={() => setShowRemoveDialog(true)}>
               <DeleteOutline color="error" />
-            </IconButton>}
+            </IconButton>
+          }
         </Stack>
       </Stack>
       <ConfirmDialog open={showSaveDialog} setOpen={setShowSaveDialog} text="Are you sure you want to make changes to this table?" onConfirm={save} onAbort={() => { }} />
       <ConfirmDialog open={showRemoveDialog} setOpen={setShowRemoveDialog} text="Are you sure you want to remove this table?" onConfirm={remove} onAbort={() => { }} />
+      <ConfirmDialog open={showUndoDialog} setOpen={setShowUndoDialog} text="Are you sure you want to undo removal of this table?" onConfirm={undo} onAbort={() => { }} />
 
 
     </Box>

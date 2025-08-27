@@ -1,9 +1,29 @@
-import { MutationResolvers } from '@/generated/graphql';
+import { MutationResolvers, Table } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
 
 export const tableMutationResolvers: MutationResolvers<GraphQLContext> = {
+  addTable: async (_, { restaurantId, name, seats }, { tables }) => {
+    const newTableId = new ObjectId();
+
+    const newTable: Partial<Table> = {
+      restaurantId: new ObjectId(restaurantId),
+      name,
+      seats,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const result = await tables.findOneAndUpdate(
+      { _id: newTableId },
+      { $set: newTable },
+      { upsert: true, returnDocument: "after" });
+
+    if (!result) throw new GraphQLError("Failed to add table");
+
+    return result;
+  },
   updateTable: async (_, { tableId, name, seats }, { tables }) => {
     const update = {
       ...(name && { name }),
@@ -33,7 +53,7 @@ export const tableMutationResolvers: MutationResolvers<GraphQLContext> = {
 
     return removedTable;
   },
-  undoRemoval: async (_, { tableId }, { tables }) => {
+  undoTableRemoval: async (_, { tableId }, { tables }) => {
     const updatedTable = await tables.findOneAndUpdate(
       { _id: new ObjectId(tableId) },
       {

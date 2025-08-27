@@ -47,12 +47,14 @@ export type Mutation = {
   __typename?: 'Mutation';
   addMenuItem: MenuItem;
   addReservation: Reservation;
+  addRestaurant: Restaurant;
+  addTable: Table;
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
   removeTable: Table;
   signIn: AuthRes;
   signOut: AuthRes;
-  undoRemoval: Table;
+  undoTableRemoval: Table;
   updateMenuItem: MenuItem;
   updateRestaurant: Restaurant;
   updateTable: Table;
@@ -80,6 +82,22 @@ export type MutationAddReservationArgs = {
 };
 
 
+export type MutationAddRestaurantArgs = {
+  adress: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  openingDays: Array<WeekDays>;
+  openingHours: OpeningHoursInput;
+  sittings: Array<SittingInput>;
+};
+
+
+export type MutationAddTableArgs = {
+  name: Scalars['String']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  seats: Scalars['Int']['input'];
+};
+
+
 export type MutationAddUserArgs = {
   email: Scalars['String']['input'];
   name: Scalars['String']['input'];
@@ -104,7 +122,7 @@ export type MutationSignInArgs = {
 };
 
 
-export type MutationUndoRemovalArgs = {
+export type MutationUndoTableRemovalArgs = {
   tableId: Scalars['ObjectId']['input'];
 };
 
@@ -483,12 +501,14 @@ export type MenuItemResolvers<ContextType = any, ParentType extends ResolversPar
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationAddMenuItemArgs, 'categoryName' | 'name' | 'price' | 'restaurantId' | 'vegetarian'>>;
   addReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationAddReservationArgs, 'email' | 'firstName' | 'lastName' | 'partySize' | 'restaurantId' | 'sittingStart'>>;
+  addRestaurant?: Resolver<ResolversTypes['Restaurant'], ParentType, ContextType, RequireFields<MutationAddRestaurantArgs, 'adress' | 'name' | 'openingDays' | 'openingHours' | 'sittings'>>;
+  addTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationAddTableArgs, 'name' | 'restaurantId' | 'seats'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
   removeTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationRemoveTableArgs, 'tableId'>>;
   signIn?: Resolver<ResolversTypes['authRes'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<ResolversTypes['authRes'], ParentType, ContextType>;
-  undoRemoval?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUndoRemovalArgs, 'tableId'>>;
+  undoTableRemoval?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUndoTableRemovalArgs, 'tableId'>>;
   updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;
   updateRestaurant?: Resolver<ResolversTypes['Restaurant'], ParentType, ContextType, RequireFields<MutationUpdateRestaurantArgs, 'restaurantId'>>;
   updateTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUpdateTableArgs, 'tableId'>>;

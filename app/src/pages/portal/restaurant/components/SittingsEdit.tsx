@@ -37,7 +37,12 @@ export const SittingsEdit = ({ sittings, onChange }: SittingsEditProps) => {
     <Stack spacing={2} >
       <Box display="flex" flexWrap="wrap" gap={1}>
         {localSittings.map((s, i) => (
-          <Box key={i} sx={{ width: 'calc(50% - 8px)' }}>
+          <Box
+            key={i}
+            sx={{
+              width: localSittings.length === 1 ? '100%' : 'calc(50% - 8px)'
+            }}
+          >
             <Stack direction="row" spacing={1} alignItems="center">
               <TimeInput
                 label="Start Time"

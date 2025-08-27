@@ -14,7 +14,7 @@ const RestaurantSelect = ({ data, selectedRestaurant, setSelectedRestaurant }: R
     <>
       {data && (
         <>
-          <FormControl fullWidth>
+          <FormControl sx={{ minWidth: 200 }}>
             <InputLabel id="restaurant-label">Restaurant</InputLabel>
             <Select
               labelId="restaurant-label"

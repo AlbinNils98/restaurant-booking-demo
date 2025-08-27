@@ -10,6 +10,7 @@ import { authDirectiveTransformer } from './graphql/directives/authDirective';
 import { getCurrentUser } from './auth/getCurrentUser';
 import { seedInitialData } from './dbSeed';
 import cookieParser from 'cookie-parser';
+import { TABLE_TTL_SECONDS } from './constants/constants';
 
 const envFile = process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev";
 
@@ -33,7 +34,7 @@ export async function initServer() {
   const tableCollection = db.collection<Table>("table");
   await tableCollection.createIndex(
     { removedAt: 1 },
-    { expireAfterSeconds: 2592000, name: "RemovedAtTTL" }
+    { expireAfterSeconds: TABLE_TTL_SECONDS, name: "RemovedAtTTL" }
   );
   const reservationCollection = db.collection<Reservation>("reservation");
 

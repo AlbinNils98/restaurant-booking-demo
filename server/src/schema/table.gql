@@ -1,5 +1,12 @@
 
 type Mutation {
+
+  addTable(
+    restaurantId: ObjectId!
+    name: String!
+    seats: Int!
+  ): Table!
+
   updateTable(
     tableId: ObjectId!
     name: String
@@ -8,7 +15,7 @@ type Mutation {
 
     removeTable(tableId: ObjectId!): Table!
 
-    undoRemoval(tableId: ObjectId!): Table!
+    undoTableRemoval(tableId: ObjectId!): Table!
 }
 
 type Query {

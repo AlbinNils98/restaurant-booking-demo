@@ -1,5 +1,13 @@
 
 type Mutation {
+  addRestaurant(  
+    name: String!,
+    adress: String!,
+    openingDays: [WeekDays!]!,
+    openingHours: OpeningHoursInput!,
+    sittings: [SittingInput!]!
+  ): Restaurant!
+
   updateRestaurant(
     restaurantId: ObjectId!,
     name: String,
