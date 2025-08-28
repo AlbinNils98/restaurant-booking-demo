@@ -1,4 +1,4 @@
-import { Button, ButtonBase, Chip, IconButton, ListItem, ListItemText, TextField } from '@mui/material';
+import { Button, ButtonBase, Chip, IconButton, ListItem, ListItemText, Stack, TextField } from '@mui/material';
 import type { MenuItem, RemoveMenuItemMutation, RemoveMenuItemMutationVariables, UpdateMenuItemMutation, UpdateMenuItemMutationVariables } from '../../../../generated/graphql';
 import { useEffect, useState } from 'react';
 import { useMutation } from '@apollo/client';
@@ -79,10 +79,12 @@ const MenuItemRow = ({ item, restaurantId = "" }: MenuItemRowProps) => {
     <>
       {!edit ?
         <MenuItemRowView item={item} >
-          <Button onClick={handleEdit}>Edit</Button>
-          <IconButton onClick={handleDelete}>
-            <DeleteOutline color="error" />
-          </IconButton>
+          <Stack direction="row" ml={2} spacing={1}>
+            <Button variant='outlined' onClick={handleEdit}>Edit</Button>
+            <IconButton onClick={handleDelete}>
+              <DeleteOutline color="error" />
+            </IconButton>
+          </Stack>
 
         </MenuItemRowView>
         :
@@ -116,12 +118,12 @@ const MenuItemRow = ({ item, restaurantId = "" }: MenuItemRowProps) => {
                   </ButtonBase>
 
                   <TextField
-                    label="Price"
+                    label="Price (öre)"
                     value={menuItemData.price ?? item.price}
                     variant='outlined'
                     size='small'
                     onChange={(e) => updateMenuItemData({ price: Number(e.target.value) })}
-                    sx={{ width: 80 }}
+                    sx={{ width: 90 }}
                   />
 
                 </div>
@@ -148,8 +150,10 @@ const MenuItemRow = ({ item, restaurantId = "" }: MenuItemRowProps) => {
             }}
 
           />
-          <Button onClick={handleSave}>Save</Button>
-          <Button onClick={handleEdit}>Abort</Button>
+          <Stack direction="column" ml={2} gap={1}>
+            <Button variant='outlined' onClick={handleSave}>Save</Button>
+            <Button variant='outlined' onClick={handleEdit}>Abort</Button>
+          </Stack>
 
 
         </ListItem>}

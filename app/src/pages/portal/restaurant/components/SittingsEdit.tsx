@@ -35,7 +35,7 @@ export const SittingsEdit = ({ sittings, onChange }: SittingsEditProps) => {
 
   return (
     <Stack spacing={2} >
-      <Box display="flex" flexWrap="wrap" gap={1}>
+      <Box display="flex" maxWidth={600} flexWrap="wrap" gap={1}>
         {localSittings.map((s, i) => (
           <Box
             key={i}

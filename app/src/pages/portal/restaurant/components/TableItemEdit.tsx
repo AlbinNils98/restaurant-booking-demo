@@ -1,6 +1,6 @@
 import { Box, Button, Chip, IconButton, Stack, TextField, Typography } from '@mui/material';
 import type { RemoveTableMutation, RemoveTableMutationVariables, Table, UndoTableRemovalMutation, UndoTableRemovalMutationVariables, UpdateTableMutation, UpdateTableMutationVariables } from '../../../../generated/graphql';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DeleteOutline, UndoOutlined } from '@mui/icons-material';
 import ConfirmDialog from '../../../../components/Dialog';
 import { useMutation } from '@apollo/client';
@@ -20,6 +20,11 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
   const [tableData, setTableData] = useState<UpdateTableMutationVariables>({
     tableId: table._id
   });
+
+  const [errors, setErrors] = useState<{
+    name?: string;
+    seats?: string;
+  }>({});
 
   const [updateTable] = useMutation<UpdateTableMutation, UpdateTableMutationVariables>(UPDATE_TABLE_MUTATION,
     {
@@ -51,12 +56,44 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
     setEdit(!edit);
   };
 
+  useEffect(() => {
+    if (!edit) {
+      setTableData({ tableId: table._id });
+      setErrors({});
+    }
+  }, [edit]);
+
   const updateTableData = (data: Partial<UpdateTableMutationVariables>) => {
     setTableData({
       ...tableData,
       ...data
     })
   };
+
+  const handleSave = () => {
+    const newErrors: typeof errors = {};
+    if (tableData.name !== undefined) {
+      if (!tableData.name) {
+        newErrors.name = "Name is required";
+      }
+    }
+
+    if (tableData.seats !== undefined && tableData.seats !== null) {
+      if (tableData.seats < 1) {
+        newErrors.seats = "Seats must be at least 1";
+      }
+
+      if (tableData.seats > 20) {
+        newErrors.seats = "Seats cannot be more than 20";
+      }
+    }
+
+    setErrors(newErrors);
+
+    if (Object.keys(newErrors).length > 0) return;
+
+    setShowSaveDialog(true);
+  }
 
   const save = () => {
     updateTable({ variables: tableData })
@@ -84,8 +121,20 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
         <Box>
           {edit ?
             <Stack direction="row" spacing={2}>
-              <TextField label="Name" value={tableData.name ?? table.name} onChange={(e) => updateTableData({ name: e.target.value })} />
-              <TextField label="Seats" value={tableData.seats ?? table.seats} type='number' onChange={(e) => updateTableData({ seats: Number(e.target.value) })} />
+              <TextField
+                label="Name"
+                value={tableData.name ?? table.name}
+                error={!!errors.name}
+                helperText={errors.name}
+                onChange={(e) => updateTableData({ name: e.target.value })}
+              />
+              <TextField
+                label="Seats"
+                value={tableData.seats ?? table.seats}
+                error={!!errors.seats}
+                helperText={errors.seats}
+                type='number'
+                onChange={(e) => updateTableData({ seats: Number(e.target.value) })} />
             </Stack>
             :
             <Stack direction='row' alignItems='center' spacing={2}>
@@ -107,7 +156,7 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
               <UndoOutlined />
             </IconButton>
           }
-          {edit && <Button variant='outlined' onClick={() => setShowSaveDialog(true)}>Save</Button>}
+          {edit && <Button variant='outlined' onClick={handleSave}>Save</Button>}
           <Button variant='outlined' onClick={toggleEdit}>{edit ? "Abort" : "Edit"}</Button>
           {(!edit && !table.removedAt) &&
             <IconButton onClick={() => setShowRemoveDialog(true)}>

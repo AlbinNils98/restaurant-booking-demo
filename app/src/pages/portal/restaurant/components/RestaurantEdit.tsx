@@ -207,16 +207,7 @@ const RestaurantEdit = ({ restaurant }: RestaurantEditProps) => {
               )}
             </Stack>
 
-            <Stack direction="column" gap={1} sx={{ width: "max-content" }}>
-              {edit && (
-                <Button variant="outlined" onClick={handleSave} fullWidth>
-                  Save
-                </Button>
-              )}
-              <Button variant="outlined" onClick={toggleEdit} fullWidth>
-                {edit ? "Abort" : "Edit"}
-              </Button>
-            </Stack>
+
           </Stack>
           <Stack spacing={2} alignItems="flex-start" flexWrap="wrap" >
             <Typography fontWeight='bold'>Sittings:</Typography>
@@ -227,7 +218,19 @@ const RestaurantEdit = ({ restaurant }: RestaurantEditProps) => {
               :
               <SittingsList sittings={restaurant.sittings} />}
           </Stack>
+          <Stack direction="row" alignSelf="end" gap={1} sx={{ width: "max-content" }}>
+            {edit && (
+              <Button variant="outlined" onClick={handleSave} fullWidth>
+                Save
+              </Button>
+            )}
+            <Button variant="outlined" onClick={toggleEdit} fullWidth>
+              {edit ? "Abort" : "Edit"}
+            </Button>
+          </Stack>
+
         </Stack>
+
       </CardContent>
       <ConfirmDialog open={showSaveDialog} setOpen={setShowSaveDialog} text="Are you sure you want to change this item?" onConfirm={save} onAbort={() => { }} />
     </Card>

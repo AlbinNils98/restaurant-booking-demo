@@ -125,8 +125,8 @@ const MenuItemAdd = ({ restaurantId, toggleAddItem, addItem }: MenuItemAddProps)
 
 
       <Box sx={{ display: "flex", gap: 1 }}>
-        <Button onClick={handleAddMenuItem}>Save</Button>
-        <Button onClick={toggleAddItem}>Abort</Button>
+        <Button variant='outlined' onClick={handleAddMenuItem}>Save</Button>
+        <Button variant='outlined' onClick={toggleAddItem}>Abort</Button>
       </Box>
       <ConfirmDialog open={showDialog} setOpen={setShowDialog} text="Are you sure you want to add this item to the menu?" onConfirm={addMenuItem} onAbort={() => { }} />
 

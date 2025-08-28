@@ -106,7 +106,6 @@ const RestaurantCreate = ({ toggleCreate }: RestaurantCreateProps) => {
           Add Restaurant
         </Typography>
         <Stack direction="column" spacing={2}>
-          {/* Name and Address */}
           <Stack direction="row" spacing={6} flexWrap="wrap">
             <Stack gap={2}>
               <TextField
@@ -127,7 +126,6 @@ const RestaurantCreate = ({ toggleCreate }: RestaurantCreateProps) => {
               />
             </Stack>
 
-            {/* Opening Hours and Days */}
             <Stack gap={2} flex={1}>
               <Stack direction="row" spacing={2} alignItems="center">
                 <TimeInput
@@ -209,19 +207,8 @@ const RestaurantCreate = ({ toggleCreate }: RestaurantCreateProps) => {
                 )}
               </Stack>
             </Stack>
-
-            {/* Action Buttons */}
-            <Stack direction="column" gap={1} sx={{ width: "max-content" }}>
-              <Button variant="outlined" onClick={handleSave} fullWidth>
-                Save
-              </Button>
-              <Button variant="outlined" onClick={toggleCreate} fullWidth>
-                Abort
-              </Button>
-            </Stack>
           </Stack>
 
-          {/* Sittings */}
           <Stack spacing={2} alignItems="flex-start" flexWrap="wrap">
             <Typography fontWeight="bold">Sittings:</Typography>
             <SittingsEdit
@@ -230,10 +217,18 @@ const RestaurantCreate = ({ toggleCreate }: RestaurantCreateProps) => {
             />
             {errors.sittings && <Typography color="error">{errors.sittings}</Typography>}
           </Stack>
+
+          <Stack direction="row" alignSelf="end" gap={1} sx={{ width: "max-content" }}>
+            <Button variant="outlined" onClick={handleSave} fullWidth>
+              Save
+            </Button>
+            <Button variant="outlined" onClick={toggleCreate} fullWidth>
+              Abort
+            </Button>
+          </Stack>
         </Stack>
       </CardContent>
 
-      {/* Confirm Dialog */}
       <ConfirmDialog
         open={showSaveDialog}
         setOpen={setShowSaveDialog}

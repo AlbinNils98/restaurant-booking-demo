@@ -2,14 +2,16 @@ import { Button, Card, CardContent, Divider, Stack, Typography } from '@mui/mate
 import type { GetTablesQuery, GetTablesQueryVariables } from '../../../../generated/graphql';
 import { useLazyQuery } from '@apollo/client';
 import { GET_TABLES_QUERY } from '../../../../graphql/query/tables';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import TableItemEdit from './TableItemEdit';
+import TableItemCreate from './TableItemCreate';
 
 type TableEditProps = {
   selectedRestaurant: string;
 }
 
 const TableEdit = ({ selectedRestaurant }: TableEditProps) => {
+  const [create, setCreate] = useState(false);
 
   const [getTables, { data: tables }] = useLazyQuery<GetTablesQuery, GetTablesQueryVariables>(GET_TABLES_QUERY);
 
@@ -19,8 +21,8 @@ const TableEdit = ({ selectedRestaurant }: TableEditProps) => {
     }
   }, [selectedRestaurant]);
 
-  const handleAdd = () => {
-
+  const toggleCreate = () => {
+    setCreate(!create);
   }
 
   return (
@@ -30,10 +32,11 @@ const TableEdit = ({ selectedRestaurant }: TableEditProps) => {
           <Typography variant="h6" gutterBottom>
             Tables
           </Typography>
-          <Button variant='outlined' onClick={handleAdd}>Add Table</Button>
+          {!create && <Button variant='outlined' onClick={toggleCreate}>Add Table</Button>}
         </Stack>
         <Divider sx={{ mb: 2, mt: 2 }} />
         <Stack spacing={1}>
+          {create && <TableItemCreate restaurantId={selectedRestaurant} toggleCreate={toggleCreate} />}
           {tables?.getTables.map((table) => (
             <TableItemEdit key={table._id} table={table} />
           ))}
