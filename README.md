@@ -16,3 +16,12 @@ I have added husky to the root of the project for running linting and typechecki
 - Express.js
 - TypeScript
 - Codegen
+
+## App
+
+### Techstack
+- Vite (React)
+- Material UI
+- Apollo Client
+- TypeScript
+- Codegen
