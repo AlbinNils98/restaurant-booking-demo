@@ -1,11 +1,108 @@
-import { MutationResolvers } from '@/generated/graphql';
+import { MutationResolvers, Restaurant, WeekDays } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
-import { it } from 'node:test';
-
 
 export const restaurantMutationResolvers: MutationResolvers<GraphQLContext> = {
+  addRestaurant: async (_, {
+    name,
+    adress,
+    openingDays,
+    openingHours,
+    sittings
+  }, { restaurants }
+  ) => {
+
+    if (openingDays.length === 0) {
+      throw new GraphQLError("At least one opening day must be specified");
+    }
+
+    const validDays = Object.values(WeekDays);
+    for (const day of openingDays) {
+      if (!validDays.includes(day)) {
+        throw new GraphQLError(`Invalid opening day: ${day}`);
+      }
+    }
+
+    // Validate opening hours format (HH:MM)
+    const timeRegex = /^([0-1]\d|2[0-3]):([0-5]\d)$/;
+    if (!timeRegex.test(openingHours.open) || !timeRegex.test(openingHours.close)) {
+      throw new GraphQLError("Opening hours must be in HH:MM format");
+    }
+
+    // Validate sittings
+    if (sittings.length === 0) {
+      throw new GraphQLError("At least one sitting must be specified");
+    }
+    for (const sitting of sittings) {
+      if (!timeRegex.test(sitting.startTime)) {
+        throw new GraphQLError(`Invalid sitting start time: ${sitting.startTime}`);
+      }
+      if (sitting.durationMinutes <= 0) {
+        throw new GraphQLError("Sitting duration must be a positive integer");
+      }
+    }
+
+    const newRestaurantId = new ObjectId();
+
+    const newRestaurant: Partial<Restaurant> = {
+      name,
+      adress,
+      openingDays,
+      openingHours: {
+        open: openingHours.open,
+        close: openingHours.close
+      },
+      sittings: sittings.map(s => ({
+        startTime: s.startTime,
+        durationMinutes: s.durationMinutes
+      })),
+      menu: []
+    };
+
+    const result = await restaurants.findOneAndUpdate(
+      { _id: newRestaurantId },
+      { $set: newRestaurant },
+      { upsert: true, returnDocument: "after" });
+
+    if (!result) {
+      throw new GraphQLError("Failed to create restaurant");
+    }
+
+    return result;
+  },
+  updateRestaurant: async (_, {
+    restaurantId,
+    name,
+    adress,
+    openingDays,
+    openingHours,
+    sittings
+  },
+    { restaurants }
+  ) => {
+    const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
+    if (!restaurant) throw new GraphQLError("Restaurant not found");
+
+    const update = {
+      ...(name && { name }),
+      ...(adress! && { adress }),
+      ...(openingDays && { openingDays }),
+      ...(openingHours && { openingHours }),
+      ...(sittings && { sittings }),
+    };
+
+    const result = await restaurants.findOneAndUpdate(
+      { _id: new ObjectId(restaurantId) },
+      { $set: update },
+      { returnDocument: "after" }
+    );
+
+    if (!result) throw new GraphQLError("Failed to update restaurant");
+
+    return result;
+  },
+
   addMenuItem: async (_parent, { restaurantId, categoryName, name, description, price, vegetarian }, { restaurants }) => {
 
     const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });

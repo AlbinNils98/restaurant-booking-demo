@@ -5,6 +5,16 @@ query GetAllRestaurants {
   getAllRestaurants {
     _id
     name
+    adress
+    openingDays
+    openingHours {
+    open
+    close
+    }
+    sittings {
+    startTime
+    durationMinutes
+    }
   }
 }`
 

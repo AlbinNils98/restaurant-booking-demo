@@ -1,3 +1,4 @@
+import { TABLE_TTL_DAYS } from '@/constants/constants';
 import { MenuCategory, QueryResolvers, WeekDays } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { GraphQLError } from 'graphql';
@@ -9,9 +10,12 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
     return restaurantDocs.map(restaurant => ({
       _id: restaurant._id,
       name: restaurant.name,
+      adress: restaurant.adress,
+      openingDays: restaurant.openingDays,
+      openingHours: restaurant.openingHours,
+      sittings: restaurant.sittings
     }));
   },
-
   getAvailableSittings: async (_parent, { restaurantId, partySize }, { restaurants, tables, reservations }) => {
     const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
     if (!restaurant) throw new GraphQLError("Restaurant not found");
@@ -36,9 +40,31 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
       { projection: { tableId: 1, sittingStart: 1, sittingEnd: 1 } }
     ).toArray();
 
+    const lastReservationByWeekday = new Map<WeekDays, Date>();
+
+    for (const r of allRes) {
+      const date = new Date(r.sittingStart);
+      const dayName = WEEKDAY[date.getDay()];
+
+      // Track last reservation per weekday
+      if (
+        !lastReservationByWeekday.has(dayName) ||
+        date > lastReservationByWeekday.get(dayName)!
+      ) {
+        lastReservationByWeekday.set(dayName, date);
+      }
+    }
+
     for (let d = new Date(now); d <= horizon; d.setDate(d.getDate() + 1)) {
       const dayName = WEEKDAY[new Date(d).getDay()];
-      if (!restaurant.openingDays.includes(dayName)) continue;
+      const dateStr = d.toDateString();
+
+      // Skip if weekday not in openingDays
+      // and either no reservations OR date is after last reservation for that weekday
+      if (!restaurant.openingDays.includes(dayName)) {
+        const lastRes = lastReservationByWeekday.get(dayName);
+        if (!lastRes || d > lastRes) continue;
+      }
 
       for (const sitting of restaurant.sittings) {
         const [hours, minutes] = sitting.startTime.split(":").map(Number);
@@ -54,7 +80,22 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
         );
 
         const takenTableIds = new Set(overlaps.map(r => r.tableId.toString()));
-        const freeTables = validTables.filter(t => !takenTableIds.has(t._id.toString()));
+
+        const freeTables = validTables.filter(t => {
+          if (t.removedAt) {
+            // TTL removes table 30 days after removedAt
+            const expiry = new Date(t.removedAt);
+            expiry.setDate(expiry.getDate() + TABLE_TTL_DAYS);
+            expiry.setHours(0, 0, 0, 0);
+
+            // cutoff is the day before expiry
+            if (startTime >= expiry) {
+              return false;
+            }
+          }
+
+          return !takenTableIds.has(t._id.toString());
+        });
 
         if (freeTables.length > 0) {
           results.push(startTime)

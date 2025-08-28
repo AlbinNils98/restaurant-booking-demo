@@ -43,6 +43,7 @@ export async function seedInitialData(db: Db) {
       {
         _id: rest1Id,
         name: "Sunny Side Diner",
+        adress: "Street Name, City",
         menu: [
           {
             category: CategoryName.Breakfast,
@@ -90,6 +91,7 @@ export async function seedInitialData(db: Db) {
           },
         ],
         openingDays: [WeekDays.Tuesday, WeekDays.Wednesday, WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday],
+        openingHours: { open: "12:00", close: "23:00" },
         sittings: [
           { startTime: "08:00", durationMinutes: 90 },
           { startTime: "09:30", durationMinutes: 90 },
@@ -103,6 +105,7 @@ export async function seedInitialData(db: Db) {
       {
         _id: rest2Id,
         name: "Moonlight Eatery",
+        adress: "Street Name, City",
         menu: [
           {
             category: CategoryName.Appetizers,
@@ -141,6 +144,7 @@ export async function seedInitialData(db: Db) {
           },
         ],
         openingDays: [WeekDays.Tuesday, WeekDays.Wednesday, WeekDays.Thursday, WeekDays.Friday, WeekDays.Saturday],
+        openingHours: { open: "12:00", close: "23:00" },
         sittings: [
           { startTime: "16:00", durationMinutes: 90 },
           { startTime: "17:30", durationMinutes: 90 },

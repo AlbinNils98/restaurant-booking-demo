@@ -10,6 +10,7 @@ import { authDirectiveTransformer } from './graphql/directives/authDirective';
 import { getCurrentUser } from './auth/getCurrentUser';
 import { seedInitialData } from './dbSeed';
 import cookieParser from 'cookie-parser';
+import { TABLE_TTL_SECONDS } from './constants/constants';
 
 const envFile = process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev";
 
@@ -31,11 +32,18 @@ export async function initServer() {
   const userCollection = db.collection<User>("user");
   const restaurantCollection = db.collection<Restaurant>("restaurant");
   const tableCollection = db.collection<Table>("table");
+  await tableCollection.createIndex(
+    { removedAt: 1 },
+    { expireAfterSeconds: TABLE_TTL_SECONDS, name: "RemovedAtTTL" }
+  );
   const reservationCollection = db.collection<Reservation>("reservation");
 
-  // Seed initial data
-  // Should be removed in production
-  await seedInitialData(db);
+  if (process.env.NODE_ENV === "production") {
+    console.log("🚫 Skipping DB seed in production");
+  } else {
+    console.log("🌱 Seeding initial data (dev only)...");
+    await seedInitialData(db);
+  }
 
   console.log("✅ Connected to MongoDB and initialized collections");
 
