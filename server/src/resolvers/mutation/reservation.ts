@@ -3,7 +3,6 @@ import { EmailTemplate, getTemplate } from '@/email/templateLoader';
 import { MutationResolvers, Reservation } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import generateConfirmationCode from '@/util/generateConfirmationCode';
-import normalizeDate from '@/util/normalizeDate';
 import validateEmail from '@/util/validateEmail';
 import { GraphQLError } from 'graphql';
 import { ObjectId } from 'mongodb';
@@ -44,7 +43,6 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
       })
       .toArray();
 
-    // Convert tableIds to string or ObjectId for matching
     const reservedTableIds = overlappingReservations.map(r => r.tableId.toString());
 
     // Pick the first table that fits the party size and isn't reserved
@@ -110,6 +108,117 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
     });
 
     return newReservation;
+  },
+
+  updateReservation: async (
+    _parent,
+    { reservationId, firstName, lastName, message, email, partySize, sittingStart },
+    { reservations, tables, restaurants }
+  ) => {
+    if (email && !validateEmail(email)) {
+      throw new GraphQLError("Invalid email format");
+    }
+
+    const reservation = await reservations.findOne({ _id: new ObjectId(reservationId) });
+    if (!reservation) throw new GraphQLError("Reservation not found");
+
+    const restaurant = await restaurants.findOne({ _id: reservation.restaurantId });
+    if (!restaurant) throw new GraphQLError("Restaurant not found");
+
+    let updatedFields: Partial<Reservation> = {
+      ...(firstName && { firstName }),
+      ...(lastName && { lastName }),
+      ...(message && { message }),
+      ...(email && { email }),
+      ...(partySize && { partySize }),
+      updatedAt: new Date(),
+    };
+
+    // Handle sittingStart change
+    if (sittingStart && new Date(sittingStart).getTime() !== reservation.sittingStart.getTime()) {
+      // Find the sitting object for the new start time
+      const sitting = restaurant.sittings.find(s => {
+        const [hours, minutes] = s.startTime.split(":").map(Number);
+        const sittingDate = new Date(sittingStart);
+        sittingDate.setHours(hours, minutes, 0, 0);
+        return sittingDate.getTime() === new Date(sittingStart).getTime();
+      });
+      if (!sitting) throw new GraphQLError("No sitting available at the selected time");
+
+      const sittingStartDate = new Date(sittingStart);
+      const sittingEnd = new Date(sittingStartDate.getTime() + sitting.durationMinutes * 60000);
+
+      // Find overlapping reservations, excluding current reservation
+      const overlappingReservations = await reservations
+        .find({
+          restaurantId: restaurant._id,
+          _id: { $ne: reservation._id },
+          $or: [
+            { sittingStart: { $lt: sittingEnd }, sittingEnd: { $gt: sittingStartDate } }
+          ]
+        })
+        .toArray();
+
+      const reservedTableIds = overlappingReservations.map(r => r.tableId.toString());
+
+      // Find an available table for the party size
+      const availableTable = await tables.findOne({
+        restaurantId: restaurant._id,
+        seats: { $gte: partySize || reservation.partySize },
+        _id: { $nin: reservedTableIds.map(id => new ObjectId(id)) },
+      });
+
+      if (!availableTable) throw new GraphQLError("No tables available for this sitting");
+
+      updatedFields = {
+        ...updatedFields,
+        tableId: availableTable._id,
+        sittingStart: sittingStartDate,
+        sittingEnd,
+      };
+    } else if (partySize && partySize !== reservation.partySize) {
+      // If only party size changed, check current table
+      const table = await tables.findOne({ _id: reservation.tableId });
+      if (!table) throw new GraphQLError("Table not found");
+      if (table.seats < partySize) {
+        throw new GraphQLError("Current table cannot accommodate the new party size. Choose a new sitting.");
+      }
+    }
+
+    const updatedReservation = await reservations.findOneAndUpdate(
+      { _id: new ObjectId(reservationId) },
+      { $set: updatedFields },
+      { returnDocument: "after" }
+    );
+
+    if (!updatedReservation) throw new GraphQLError("Failed to update reservation");
+    await sendEmail(
+      updatedReservation.email,
+      "Your Table Booking is Confirmed!",
+      confirmationMessage({
+        firstName: updatedReservation.firstName,
+        lastName: updatedReservation.lastName,
+        confirmationCode: updatedReservation.confirmationCode,
+        arrival: updatedReservation.sittingStart.toLocaleString(),
+        partySize: updatedReservation.partySize,
+        restaurantName: restaurant.name,
+      }),
+      getTemplate(EmailTemplate.CONFIRMATION, {
+        firstName: updatedReservation.firstName,
+        lastName: updatedReservation.lastName,
+        confirmationCode: updatedReservation.confirmationCode,
+        arrival: updatedReservation.sittingStart.toLocaleString(),
+        partySize: updatedReservation.partySize,
+        restaurantName: restaurant.name,
+      })
+    ).catch(async () => {
+      await reservations.deleteOne({ _id: updatedReservation._id });
+      throw new GraphQLError(
+        "Failed to confirm reservation via email, please contact the restaurant directly or try again later."
+      );
+    });
+
+    return updatedReservation;
   },
 }
 

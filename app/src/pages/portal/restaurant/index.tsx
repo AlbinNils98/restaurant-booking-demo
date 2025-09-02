@@ -29,7 +29,7 @@ const RestaurantPortalPage = () => {
   }
 
   return (
-    <Box>
+    <Box sx={{ maxWidth: 800, margin: "0 auto" }}>
       {create ?
         <RestaurantCreate toggleCreate={toggleCreate} />
         :

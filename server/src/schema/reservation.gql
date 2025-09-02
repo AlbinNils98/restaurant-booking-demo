@@ -1,4 +1,30 @@
 
+type Mutation {
+  addReservation(
+    restaurantId: ObjectId!,
+    firstName: String!,
+    lastName: String!,
+    email: String!,
+    message: String,
+    sittingStart: DateTime!, 
+    partySize: Int!,
+    ): Reservation! @public
+
+    updateReservation(
+      reservationId: ObjectId!,
+      firstName: String,
+      lastName: String,
+      email: String,
+      message: String,
+      partySize: Int,
+      sittingStart: DateTime
+    ): Reservation!
+}
+
+type Query {
+  getReservationsByRestaurant(restaurantId: ObjectId!): [ReservationDto!]!
+}
+
 type Reservation {
   _id: ObjectId!
   confirmationCode: String!
@@ -15,14 +41,21 @@ type Reservation {
   updatedAt: DateTime!
 }
 
-type Mutation {
-  addReservation(
-    restaurantId: ObjectId!,
-    firstName: String!,
-    lastName: String!,
-    email: String!,
-    message: String,
-    sittingStart: DateTime!, 
-    partySize: Int!,
-    ): Reservation! @public
+type ReservationDto {
+  _id: ObjectId!
+  confirmationCode: String!
+  restaurantId: ObjectId!
+  tableId: ObjectId!
+  partySize: Int!
+  sittingStart: DateTime!
+  sittingEnd: DateTime!
+  firstName: String!
+  lastName: String!
+  email: String!
+  message: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+
+  # Calculated fields
+  tableName: String
 }
