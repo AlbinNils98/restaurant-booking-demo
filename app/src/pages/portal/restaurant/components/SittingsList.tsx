@@ -13,7 +13,7 @@ const SittingsList = ({ sittings }: { sittings: { startTime: string; durationMin
     .sort((a, b) => a.start.getTime() - b.start.getTime());
 
   return (
-    <Box display="flex" flexWrap="wrap" gap={1}>
+    <Box display="flex" flexWrap="wrap" gap={1} maxWidth={300}>
       {sortedSittings.map((s, idx) => {
         const startStr = s.start.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });
         const endStr = s.end.toLocaleTimeString("sv-SE", { hour: "2-digit", minute: "2-digit" });

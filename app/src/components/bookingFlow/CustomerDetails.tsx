@@ -1,9 +1,9 @@
 import { Button, TextareaAutosize, TextField } from '@mui/material';
 import { useMutation } from '@apollo/client';
-import { ADD_RESERVATION_MUTATION } from '../../../graphql/mutation/reservation';
-import type { AddReservationMutation, AddReservationMutationVariables } from '../../../generated/graphql';
+import { ADD_RESERVATION_MUTATION } from '../../graphql/mutation/reservation';
+import type { AddReservationMutation, AddReservationMutationVariables } from '../../generated/graphql';
 import { useState } from 'react';
-import { useBooking } from '../../../context/Booking';
+import { useBooking } from '../../context/Booking';
 
 
 type ReservationFormProps = {

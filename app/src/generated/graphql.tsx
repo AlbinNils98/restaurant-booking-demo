@@ -51,11 +51,13 @@ export type Mutation = {
   addTable: Table;
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
+  removeReservation: Scalars['Boolean']['output'];
   removeTable: Table;
   signIn: AuthRes;
   signOut: AuthRes;
   undoTableRemoval: Table;
   updateMenuItem: MenuItem;
+  updateReservation: Reservation;
   updateRestaurant: Restaurant;
   updateTable: Table;
 };
@@ -111,6 +113,11 @@ export type MutationRemoveMenuItemArgs = {
 };
 
 
+export type MutationRemoveReservationArgs = {
+  reservationId: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationRemoveTableArgs = {
   tableId: Scalars['ObjectId']['input'];
 };
@@ -135,6 +142,18 @@ export type MutationUpdateMenuItemArgs = {
   price?: InputMaybe<Scalars['Float']['input']>;
   restaurantId: Scalars['ObjectId']['input'];
   vegetarian?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type MutationUpdateReservationArgs = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  partySize?: InputMaybe<Scalars['Int']['input']>;
+  reservationId: Scalars['ObjectId']['input'];
+  sittingStart?: InputMaybe<Scalars['DateTime']['input']>;
+  tableId?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 
@@ -170,7 +189,9 @@ export type Query = {
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
   getMenu: Array<MenuCategory>;
+  getReservationsByRestaurant: Array<ReservationDto>;
   getTables: Array<Table>;
+  getTablesForSitting: Array<Table>;
   me: UserDto;
   userByName?: Maybe<User>;
   users: Array<User>;
@@ -188,8 +209,20 @@ export type QueryGetMenuArgs = {
 };
 
 
+export type QueryGetReservationsByRestaurantArgs = {
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
 export type QueryGetTablesArgs = {
   restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetTablesForSittingArgs = {
+  partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  sitting: Scalars['DateTime']['input'];
 };
 
 
@@ -210,6 +243,24 @@ export type Reservation = {
   restaurantId: Scalars['ObjectId']['output'];
   sittingEnd: Scalars['DateTime']['output'];
   sittingStart: Scalars['DateTime']['output'];
+  tableId: Scalars['ObjectId']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ReservationDto = {
+  __typename?: 'ReservationDto';
+  _id: Scalars['ObjectId']['output'];
+  confirmationCode: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  partySize: Scalars['Int']['output'];
+  restaurantId: Scalars['ObjectId']['output'];
+  sittingEnd: Scalars['DateTime']['output'];
+  sittingStart: Scalars['DateTime']['output'];
+  table: Table;
   tableId: Scalars['ObjectId']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -319,6 +370,27 @@ export type AddReservationMutationVariables = Exact<{
 
 export type AddReservationMutation = { __typename?: 'Mutation', addReservation: { __typename?: 'Reservation', _id: string, firstName: string, lastName: string, message: string, sittingStart: string, sittingEnd: string, partySize: number, email: string, restaurantId: string, tableId: string, createdAt: string } };
 
+export type UpdateReservationMutationVariables = Exact<{
+  reservationId: Scalars['ObjectId']['input'];
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  sittingStart?: InputMaybe<Scalars['DateTime']['input']>;
+  partySize?: InputMaybe<Scalars['Int']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  tableId?: InputMaybe<Scalars['ObjectId']['input']>;
+}>;
+
+
+export type UpdateReservationMutation = { __typename?: 'Mutation', updateReservation: { __typename?: 'Reservation', _id: string } };
+
+export type RemoveReservationMutationVariables = Exact<{
+  reservationId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type RemoveReservationMutation = { __typename?: 'Mutation', removeReservation: boolean };
+
 export type AddRestaurantMutationVariables = Exact<{
   name: Scalars['String']['input'];
   adress: Scalars['String']['input'];
@@ -407,6 +479,13 @@ export type UndoTableRemovalMutationVariables = Exact<{
 
 export type UndoTableRemovalMutation = { __typename?: 'Mutation', undoTableRemoval: { __typename?: 'Table', _id: string } };
 
+export type GetReservationsByRestaurantQueryVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+}>;
+
+
+export type GetReservationsByRestaurantQuery = { __typename?: 'Query', getReservationsByRestaurant: Array<{ __typename?: 'ReservationDto', _id: string, restaurantId: string, tableId: string, confirmationCode: string, firstName: string, lastName: string, email: string, partySize: number, sittingStart: string, sittingEnd: string, message: string, createdAt: string, updatedAt: string, table: { __typename?: 'Table', _id: string, name: string, seats: number, restaurantId: string, createdAt: string, updatedAt: string } }> };
+
 export type GetAllRestaurantsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -419,6 +498,15 @@ export type GetAvailableSittingsQueryVariables = Exact<{
 
 
 export type GetAvailableSittingsQuery = { __typename?: 'Query', getAvailableSittings: Array<string> };
+
+export type GetTablesForSittingQueryVariables = Exact<{
+  restaurantId: Scalars['ObjectId']['input'];
+  sitting: Scalars['DateTime']['input'];
+  partySize: Scalars['Int']['input'];
+}>;
+
+
+export type GetTablesForSittingQuery = { __typename?: 'Query', getTablesForSitting: Array<{ __typename?: 'Table', _id: string, name: string, seats: number }> };
 
 export type GetMenuQueryVariables = Exact<{
   restaurantId: Scalars['ObjectId']['input'];
@@ -563,6 +651,86 @@ export function useAddReservationMutation(baseOptions?: Apollo.MutationHookOptio
 export type AddReservationMutationHookResult = ReturnType<typeof useAddReservationMutation>;
 export type AddReservationMutationResult = Apollo.MutationResult<AddReservationMutation>;
 export type AddReservationMutationOptions = Apollo.BaseMutationOptions<AddReservationMutation, AddReservationMutationVariables>;
+export const UpdateReservationDocument = gql`
+    mutation UpdateReservation($reservationId: ObjectId!, $firstName: String, $lastName: String, $message: String, $sittingStart: DateTime, $partySize: Int, $email: String, $tableId: ObjectId) {
+  updateReservation(
+    reservationId: $reservationId
+    firstName: $firstName
+    lastName: $lastName
+    message: $message
+    sittingStart: $sittingStart
+    partySize: $partySize
+    email: $email
+    tableId: $tableId
+  ) {
+    _id
+  }
+}
+    `;
+export type UpdateReservationMutationFn = Apollo.MutationFunction<UpdateReservationMutation, UpdateReservationMutationVariables>;
+
+/**
+ * __useUpdateReservationMutation__
+ *
+ * To run a mutation, you first call `useUpdateReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [updateReservationMutation, { data, loading, error }] = useUpdateReservationMutation({
+ *   variables: {
+ *      reservationId: // value for 'reservationId'
+ *      firstName: // value for 'firstName'
+ *      lastName: // value for 'lastName'
+ *      message: // value for 'message'
+ *      sittingStart: // value for 'sittingStart'
+ *      partySize: // value for 'partySize'
+ *      email: // value for 'email'
+ *      tableId: // value for 'tableId'
+ *   },
+ * });
+ */
+export function useUpdateReservationMutation(baseOptions?: Apollo.MutationHookOptions<UpdateReservationMutation, UpdateReservationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UpdateReservationMutation, UpdateReservationMutationVariables>(UpdateReservationDocument, options);
+      }
+export type UpdateReservationMutationHookResult = ReturnType<typeof useUpdateReservationMutation>;
+export type UpdateReservationMutationResult = Apollo.MutationResult<UpdateReservationMutation>;
+export type UpdateReservationMutationOptions = Apollo.BaseMutationOptions<UpdateReservationMutation, UpdateReservationMutationVariables>;
+export const RemoveReservationDocument = gql`
+    mutation RemoveReservation($reservationId: ObjectId!) {
+  removeReservation(reservationId: $reservationId)
+}
+    `;
+export type RemoveReservationMutationFn = Apollo.MutationFunction<RemoveReservationMutation, RemoveReservationMutationVariables>;
+
+/**
+ * __useRemoveReservationMutation__
+ *
+ * To run a mutation, you first call `useRemoveReservationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveReservationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeReservationMutation, { data, loading, error }] = useRemoveReservationMutation({
+ *   variables: {
+ *      reservationId: // value for 'reservationId'
+ *   },
+ * });
+ */
+export function useRemoveReservationMutation(baseOptions?: Apollo.MutationHookOptions<RemoveReservationMutation, RemoveReservationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveReservationMutation, RemoveReservationMutationVariables>(RemoveReservationDocument, options);
+      }
+export type RemoveReservationMutationHookResult = ReturnType<typeof useRemoveReservationMutation>;
+export type RemoveReservationMutationResult = Apollo.MutationResult<RemoveReservationMutation>;
+export type RemoveReservationMutationOptions = Apollo.BaseMutationOptions<RemoveReservationMutation, RemoveReservationMutationVariables>;
 export const AddRestaurantDocument = gql`
     mutation AddRestaurant($name: String!, $adress: String!, $openingDays: [WeekDays!]!, $openingHours: OpeningHoursInput!, $sittings: [SittingInput!]!) {
   addRestaurant(
@@ -930,6 +1098,66 @@ export function useUndoTableRemovalMutation(baseOptions?: Apollo.MutationHookOpt
 export type UndoTableRemovalMutationHookResult = ReturnType<typeof useUndoTableRemovalMutation>;
 export type UndoTableRemovalMutationResult = Apollo.MutationResult<UndoTableRemovalMutation>;
 export type UndoTableRemovalMutationOptions = Apollo.BaseMutationOptions<UndoTableRemovalMutation, UndoTableRemovalMutationVariables>;
+export const GetReservationsByRestaurantDocument = gql`
+    query GetReservationsByRestaurant($restaurantId: ObjectId!) {
+  getReservationsByRestaurant(restaurantId: $restaurantId) {
+    _id
+    restaurantId
+    tableId
+    confirmationCode
+    firstName
+    lastName
+    email
+    partySize
+    sittingStart
+    sittingEnd
+    message
+    createdAt
+    updatedAt
+    table {
+      _id
+      name
+      seats
+      restaurantId
+      createdAt
+      updatedAt
+    }
+  }
+}
+    `;
+
+/**
+ * __useGetReservationsByRestaurantQuery__
+ *
+ * To run a query within a React component, call `useGetReservationsByRestaurantQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetReservationsByRestaurantQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetReservationsByRestaurantQuery({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *   },
+ * });
+ */
+export function useGetReservationsByRestaurantQuery(baseOptions: Apollo.QueryHookOptions<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables> & ({ variables: GetReservationsByRestaurantQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>(GetReservationsByRestaurantDocument, options);
+      }
+export function useGetReservationsByRestaurantLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>(GetReservationsByRestaurantDocument, options);
+        }
+export function useGetReservationsByRestaurantSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>(GetReservationsByRestaurantDocument, options);
+        }
+export type GetReservationsByRestaurantQueryHookResult = ReturnType<typeof useGetReservationsByRestaurantQuery>;
+export type GetReservationsByRestaurantLazyQueryHookResult = ReturnType<typeof useGetReservationsByRestaurantLazyQuery>;
+export type GetReservationsByRestaurantSuspenseQueryHookResult = ReturnType<typeof useGetReservationsByRestaurantSuspenseQuery>;
+export type GetReservationsByRestaurantQueryResult = Apollo.QueryResult<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>;
 export const GetAllRestaurantsDocument = gql`
     query GetAllRestaurants {
   getAllRestaurants {
@@ -1019,6 +1247,54 @@ export type GetAvailableSittingsQueryHookResult = ReturnType<typeof useGetAvaila
 export type GetAvailableSittingsLazyQueryHookResult = ReturnType<typeof useGetAvailableSittingsLazyQuery>;
 export type GetAvailableSittingsSuspenseQueryHookResult = ReturnType<typeof useGetAvailableSittingsSuspenseQuery>;
 export type GetAvailableSittingsQueryResult = Apollo.QueryResult<GetAvailableSittingsQuery, GetAvailableSittingsQueryVariables>;
+export const GetTablesForSittingDocument = gql`
+    query GetTablesForSitting($restaurantId: ObjectId!, $sitting: DateTime!, $partySize: Int!) {
+  getTablesForSitting(
+    restaurantId: $restaurantId
+    sitting: $sitting
+    partySize: $partySize
+  ) {
+    _id
+    name
+    seats
+  }
+}
+    `;
+
+/**
+ * __useGetTablesForSittingQuery__
+ *
+ * To run a query within a React component, call `useGetTablesForSittingQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetTablesForSittingQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetTablesForSittingQuery({
+ *   variables: {
+ *      restaurantId: // value for 'restaurantId'
+ *      sitting: // value for 'sitting'
+ *      partySize: // value for 'partySize'
+ *   },
+ * });
+ */
+export function useGetTablesForSittingQuery(baseOptions: Apollo.QueryHookOptions<GetTablesForSittingQuery, GetTablesForSittingQueryVariables> & ({ variables: GetTablesForSittingQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>(GetTablesForSittingDocument, options);
+      }
+export function useGetTablesForSittingLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>(GetTablesForSittingDocument, options);
+        }
+export function useGetTablesForSittingSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>(GetTablesForSittingDocument, options);
+        }
+export type GetTablesForSittingQueryHookResult = ReturnType<typeof useGetTablesForSittingQuery>;
+export type GetTablesForSittingLazyQueryHookResult = ReturnType<typeof useGetTablesForSittingLazyQuery>;
+export type GetTablesForSittingSuspenseQueryHookResult = ReturnType<typeof useGetTablesForSittingSuspenseQuery>;
+export type GetTablesForSittingQueryResult = Apollo.QueryResult<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>;
 export const GetMenuDocument = gql`
     query GetMenu($restaurantId: ObjectId!) {
   getMenu(restaurantId: $restaurantId) {

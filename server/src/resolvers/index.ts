@@ -6,12 +6,14 @@ import { restaurantMutationResolvers } from '@/resolvers/mutation/restaurant';
 import { restaurantQueryResolvers } from './query/restaurant';
 import { tableQueryResolvers } from './query/table';
 import { tableMutationResolvers } from './mutation/table';
+import { reservationQueryResolvers } from './query/reservation';
 
 export const resolvers: Resolvers = {
   Query: {
     ...userQueryResolvers,
     ...restaurantQueryResolvers,
     ...tableQueryResolvers,
+    ...reservationQueryResolvers,
   },
   Mutation: {
     ...authMutationResolvers,

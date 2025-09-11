@@ -1,11 +1,11 @@
 import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
-import RestaurantSelect from './RestaurantSelect';
+import { useState } from 'react';
+import Confirmation from './Confirmation';
+import { useBooking } from '../../context/Booking';
 import PartySizeSelect from './PartySizeSelect';
 import SittingPicker from './SittingPicker';
 import CustomerDetails from './CustomerDetails';
-import { useState } from 'react';
-import Confirmation from './Confirmation';
-import { useBooking } from '../../../context/Booking';
+import RestaurantSelect from './RestaurantSelect';
 
 
 const steps = ["Choose Restaurant", "Party Size", "Select Sitting", "Reservation Details"];

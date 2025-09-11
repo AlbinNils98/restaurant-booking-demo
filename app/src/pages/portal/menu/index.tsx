@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { Button, Stack, Typography } from '@mui/material'
+import { Box, Button, Stack } from '@mui/material'
 import { useEffect, useState } from 'react';
 import { GET_ALL_RESTAURANTS_QUERY, GET_MENU_QUERY } from '../../../graphql/query/restaurant';
 import { type GetAllRestaurantsQuery, type GetMenuQuery, type GetMenuQueryVariables, type MenuItem } from '../../../generated/graphql';
@@ -36,10 +36,7 @@ const MenuPortalPage = () => {
   }
 
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: 16 }}>
-      <Typography variant="h4" gutterBottom>
-        Menu
-      </Typography>
+    <Box sx={{ maxWidth: 800, margin: "0 auto", paddingBottom: 4 }}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
         <RestaurantSelect
           data={restaurants}
@@ -61,7 +58,7 @@ const MenuPortalPage = () => {
           />
         )}
       />
-    </div>
+    </Box>
   );
 }
 

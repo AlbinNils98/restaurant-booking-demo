@@ -46,7 +46,9 @@ type Query {
     getMenu(restaurantId: ObjectId!): [MenuCategory!]! @public 
     getAllRestaurants: [RestaurantDto!]! @public
     getAvailableSittings(restaurantId: ObjectId!, partySize: Int!): [DateTime!]! @public
+    getTablesForSitting(restaurantId: ObjectId!, sitting: DateTime!, partySize: Int!): [Table!]!
 }
+
 
 input OpeningHoursInput {
   open: String!

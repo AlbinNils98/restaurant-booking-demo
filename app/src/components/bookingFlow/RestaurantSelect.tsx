@@ -8,9 +8,9 @@ import {
   MenuItem,
   Button,
 } from "@mui/material";
-import { GET_ALL_RESTAURANTS_QUERY } from '../../../graphql/query/restaurant';
-import type { GetAllRestaurantsQuery } from '../../../generated/graphql';
-import { useBooking } from '../../../context/Booking';
+import { GET_ALL_RESTAURANTS_QUERY } from '../../graphql/query/restaurant';
+import type { GetAllRestaurantsQuery } from '../../generated/graphql';
+import { useBooking } from '../../context/Booking';
 
 type RestaurantSelectProps = {
   onClick: () => void;

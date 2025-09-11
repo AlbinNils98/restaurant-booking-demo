@@ -20,7 +20,11 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
     const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
     if (!restaurant) throw new GraphQLError("Restaurant not found");
 
-    const validTables = await tables.find({ restaurantId: restaurant._id, seats: { $gte: partySize } }).toArray();
+    // Only consider tables that fit the party size (with a tolerance of +2)
+    const validTables = await tables.find({
+      restaurantId: restaurant._id,
+      seats: { $gte: partySize, $lte: partySize + 2 }
+    }).toArray();
     if (validTables.length === 0) return [];
 
     const results: Date[] = [];
@@ -103,6 +107,55 @@ export const restaurantQueryResolvers: QueryResolvers<GraphQLContext> = {
       }
     }
     return results;
+  },
+  getTablesForSitting: async (_parent, { restaurantId, sitting, partySize }, { restaurants, tables, reservations }) => {
+    const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });
+    if (!restaurant) throw new GraphQLError("Restaurant not found");
+
+    const sittingStart = new Date(sitting);
+    if (isNaN(sittingStart.getTime())) throw new GraphQLError("Invalid sitting date");
+
+    const sittingConfig = restaurant.sittings.find(s => {
+      const [hours, minutes] = s.startTime.split(":").map(Number);
+      const testStart = new Date(sittingStart);
+      testStart.setHours(hours, minutes, 0, 0);
+      return testStart.getTime() === sittingStart.getTime();
+    });
+
+    if (!sittingConfig) throw new GraphQLError("No sitting found for that time");
+
+    const sittingEnd = new Date(sittingStart.getTime() + sittingConfig.durationMinutes * 60000);
+
+    // All tables large enough for the party size (with a tolerance of +2)
+    const validTables = await tables.find({
+      restaurantId: restaurant._id,
+      seats: { $gte: partySize, $lte: partySize + 2 }
+    }).toArray();
+
+    if (validTables.length === 0) return [];
+
+    // Reservations that overlap this sitting
+    const overlappingReservations = await reservations.find({
+      restaurantId: restaurant._id,
+      sittingStart: { $lt: sittingEnd },
+      sittingEnd: { $gt: sittingStart },
+    }, { projection: { tableId: 1 } }).toArray();
+
+    const takenTableIds = new Set(overlappingReservations.map(r => r.tableId.toString()));
+
+    // Filter out taken/expired tables
+    const freeTables = validTables.filter(t => {
+      if (t.removedAt) {
+        const expiry = new Date(t.removedAt);
+        expiry.setDate(expiry.getDate() + TABLE_TTL_DAYS);
+        expiry.setHours(0, 0, 0, 0);
+
+        if (sittingStart >= expiry) return false;
+      }
+      return !takenTableIds.has(t._id.toString());
+    });
+
+    return freeTables;
   },
   getMenu: async (_parent, { restaurantId }, { restaurants }) => {
     const restaurant = await restaurants.findOne({ _id: new ObjectId(restaurantId) });

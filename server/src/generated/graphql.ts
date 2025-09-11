@@ -51,11 +51,13 @@ export type Mutation = {
   addTable: Table;
   addUser: User;
   removeMenuItem: Scalars['Boolean']['output'];
+  removeReservation: Scalars['Boolean']['output'];
   removeTable: Table;
   signIn: AuthRes;
   signOut: AuthRes;
   undoTableRemoval: Table;
   updateMenuItem: MenuItem;
+  updateReservation: Reservation;
   updateRestaurant: Restaurant;
   updateTable: Table;
 };
@@ -111,6 +113,11 @@ export type MutationRemoveMenuItemArgs = {
 };
 
 
+export type MutationRemoveReservationArgs = {
+  reservationId: Scalars['ObjectId']['input'];
+};
+
+
 export type MutationRemoveTableArgs = {
   tableId: Scalars['ObjectId']['input'];
 };
@@ -135,6 +142,18 @@ export type MutationUpdateMenuItemArgs = {
   price?: InputMaybe<Scalars['Float']['input']>;
   restaurantId: Scalars['ObjectId']['input'];
   vegetarian?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type MutationUpdateReservationArgs = {
+  email?: InputMaybe<Scalars['String']['input']>;
+  firstName?: InputMaybe<Scalars['String']['input']>;
+  lastName?: InputMaybe<Scalars['String']['input']>;
+  message?: InputMaybe<Scalars['String']['input']>;
+  partySize?: InputMaybe<Scalars['Int']['input']>;
+  reservationId: Scalars['ObjectId']['input'];
+  sittingStart?: InputMaybe<Scalars['DateTime']['input']>;
+  tableId?: InputMaybe<Scalars['ObjectId']['input']>;
 };
 
 
@@ -170,7 +189,9 @@ export type Query = {
   getAllRestaurants: Array<RestaurantDto>;
   getAvailableSittings: Array<Scalars['DateTime']['output']>;
   getMenu: Array<MenuCategory>;
+  getReservationsByRestaurant: Array<ReservationDto>;
   getTables: Array<Table>;
+  getTablesForSitting: Array<Table>;
   me: UserDto;
   userByName?: Maybe<User>;
   users: Array<User>;
@@ -188,8 +209,20 @@ export type QueryGetMenuArgs = {
 };
 
 
+export type QueryGetReservationsByRestaurantArgs = {
+  restaurantId: Scalars['ObjectId']['input'];
+};
+
+
 export type QueryGetTablesArgs = {
   restaurantId: Scalars['ObjectId']['input'];
+};
+
+
+export type QueryGetTablesForSittingArgs = {
+  partySize: Scalars['Int']['input'];
+  restaurantId: Scalars['ObjectId']['input'];
+  sitting: Scalars['DateTime']['input'];
 };
 
 
@@ -210,6 +243,24 @@ export type Reservation = {
   restaurantId: Scalars['ObjectId']['output'];
   sittingEnd: Scalars['DateTime']['output'];
   sittingStart: Scalars['DateTime']['output'];
+  tableId: Scalars['ObjectId']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ReservationDto = {
+  __typename?: 'ReservationDto';
+  _id: Scalars['ObjectId']['output'];
+  confirmationCode: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
+  firstName: Scalars['String']['output'];
+  lastName: Scalars['String']['output'];
+  message: Scalars['String']['output'];
+  partySize: Scalars['Int']['output'];
+  restaurantId: Scalars['ObjectId']['output'];
+  sittingEnd: Scalars['DateTime']['output'];
+  sittingStart: Scalars['DateTime']['output'];
+  table: Table;
   tableId: Scalars['ObjectId']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -383,6 +434,7 @@ export type ResolversTypes = {
   OpeningHoursInput: OpeningHoursInput;
   Query: ResolverTypeWrapper<{}>;
   Reservation: ResolverTypeWrapper<Reservation>;
+  ReservationDto: ResolverTypeWrapper<ReservationDto>;
   Restaurant: ResolverTypeWrapper<Restaurant>;
   RestaurantDto: ResolverTypeWrapper<RestaurantDto>;
   Role: Role;
@@ -411,6 +463,7 @@ export type ResolversParentTypes = {
   OpeningHoursInput: OpeningHoursInput;
   Query: {};
   Reservation: Reservation;
+  ReservationDto: ReservationDto;
   Restaurant: Restaurant;
   RestaurantDto: RestaurantDto;
   Sitting: Sitting;
@@ -505,11 +558,13 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationAddTableArgs, 'name' | 'restaurantId' | 'seats'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
+  removeReservation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveReservationArgs, 'reservationId'>>;
   removeTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationRemoveTableArgs, 'tableId'>>;
   signIn?: Resolver<ResolversTypes['authRes'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<ResolversTypes['authRes'], ParentType, ContextType>;
   undoTableRemoval?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUndoTableRemovalArgs, 'tableId'>>;
   updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;
+  updateReservation?: Resolver<ResolversTypes['Reservation'], ParentType, ContextType, RequireFields<MutationUpdateReservationArgs, 'reservationId'>>;
   updateRestaurant?: Resolver<ResolversTypes['Restaurant'], ParentType, ContextType, RequireFields<MutationUpdateRestaurantArgs, 'restaurantId'>>;
   updateTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUpdateTableArgs, 'tableId'>>;
 };
@@ -528,7 +583,9 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   getAllRestaurants?: Resolver<Array<ResolversTypes['RestaurantDto']>, ParentType, ContextType>;
   getAvailableSittings?: Resolver<Array<ResolversTypes['DateTime']>, ParentType, ContextType, RequireFields<QueryGetAvailableSittingsArgs, 'partySize' | 'restaurantId'>>;
   getMenu?: Resolver<Array<ResolversTypes['MenuCategory']>, ParentType, ContextType, RequireFields<QueryGetMenuArgs, 'restaurantId'>>;
+  getReservationsByRestaurant?: Resolver<Array<ResolversTypes['ReservationDto']>, ParentType, ContextType, RequireFields<QueryGetReservationsByRestaurantArgs, 'restaurantId'>>;
   getTables?: Resolver<Array<ResolversTypes['Table']>, ParentType, ContextType, RequireFields<QueryGetTablesArgs, 'restaurantId'>>;
+  getTablesForSitting?: Resolver<Array<ResolversTypes['Table']>, ParentType, ContextType, RequireFields<QueryGetTablesForSittingArgs, 'partySize' | 'restaurantId' | 'sitting'>>;
   me?: Resolver<ResolversTypes['UserDto'], ParentType, ContextType>;
   userByName?: Resolver<Maybe<ResolversTypes['User']>, ParentType, ContextType, RequireFields<QueryUserByNameArgs, 'name'>>;
   users?: Resolver<Array<ResolversTypes['User']>, ParentType, ContextType>;
@@ -546,6 +603,24 @@ export type ReservationResolvers<ContextType = any, ParentType extends Resolvers
   restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   sittingEnd?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   sittingStart?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  tableId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ReservationDtoResolvers<ContextType = any, ParentType extends ResolversParentTypes['ReservationDto'] = ResolversParentTypes['ReservationDto']> = {
+  _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  confirmationCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  email?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  firstName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  lastName?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  message?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  partySize?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
+  sittingEnd?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  sittingStart?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  table?: Resolver<ResolversTypes['Table'], ParentType, ContextType>;
   tableId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
@@ -619,6 +694,7 @@ export type Resolvers<ContextType = any> = {
   OpeningHours?: OpeningHoursResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Reservation?: ReservationResolvers<ContextType>;
+  ReservationDto?: ReservationDtoResolvers<ContextType>;
   Restaurant?: RestaurantResolvers<ContextType>;
   RestaurantDto?: RestaurantDtoResolvers<ContextType>;
   Sitting?: SittingResolvers<ContextType>;

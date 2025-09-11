@@ -7,7 +7,8 @@
     "preview": "vite preview",
     "typecheck": "tsc -p server/tsconfig.json --noEmit && tsc -p app/tsconfig.json --noEmit",
     "lint-only": "eslint . --ext .js,.ts,.tsx --cache",
-    "lint-quiet": "concurrently \"npm run lint-only --quiet\" \"npm run typecheck\""
+    "lint-quiet": "concurrently \"npm run lint-only --quiet\" \"npm run typecheck\"",
+    "prepare": "husky"
   },
   "author": "",
   "license": "ISC",

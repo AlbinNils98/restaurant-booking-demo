@@ -16,7 +16,7 @@ const envFile = process.env.NODE_ENV === "production" ? ".env.prod" : ".env.dev"
 
 dotenv.config({ path: envFile });
 
-console.log(process.env.NODE_ENV);
+console.log("Enviroment:", process.env.NODE_ENV);
 
 const app = express();
 app.use(express.json());

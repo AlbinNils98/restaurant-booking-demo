@@ -1,6 +1,6 @@
 import { Button, Card, CardContent, Chip, Stack, TextField, Typography } from '@mui/material';
 import { type GetAllRestaurantsQuery, type SittingInput, type UpdateRestaurantMutation, type UpdateRestaurantMutationVariables, WeekDays } from '../../../../generated/graphql';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import TimeInput from './TimeInput';
 import SittingsList from './SittingsList';
 import SittingsEdit from './SittingsEdit';
@@ -37,10 +37,6 @@ const RestaurantEdit = ({ restaurant }: RestaurantEditProps) => {
   }
 
   );
-
-  useEffect(() => {
-    console.log(restaurantData)
-  }, [restaurantData])
 
   const toggleEdit = () => {
     setEdit(!edit);
