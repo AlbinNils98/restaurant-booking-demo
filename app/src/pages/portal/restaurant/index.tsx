@@ -1,9 +1,9 @@
-import { Box, Button, Stack } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import { useQuery } from '@apollo/client'
 import { GET_ALL_RESTAURANTS_QUERY } from '../../../graphql/query/restaurant'
 import type { GetAllRestaurantsQuery } from '../../../generated/graphql'
 import RestaurantSelect from '../../../components/RestaurantSelect'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import RestaurantEdit from './components/RestaurantEdit'
 import TableEdit from './components/TableEdit'
 import RestaurantCreate from './components/RestaurantCreate'
@@ -12,13 +12,15 @@ const RestaurantPortalPage = () => {
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
   const [create, setCreate] = useState(false);
 
-  const { data: restaurants } = useQuery<GetAllRestaurantsQuery>(GET_ALL_RESTAURANTS_QUERY);
+  const { data: restaurants, loading } = useQuery<GetAllRestaurantsQuery>(GET_ALL_RESTAURANTS_QUERY);
 
-  useEffect(() => {
-    if (!selectedRestaurant && restaurants?.getAllRestaurants?.length) {
-      setSelectedRestaurant(restaurants.getAllRestaurants[0]._id);
-    }
-  }, [restaurants, selectedRestaurant]);
+  if (
+    !loading &&
+    !selectedRestaurant &&
+    restaurants?.getAllRestaurants?.length
+  ) {
+    setSelectedRestaurant(restaurants.getAllRestaurants[0]._id);
+  }
 
   const restaurant = restaurants?.getAllRestaurants.find(
     (res) => res._id === selectedRestaurant
@@ -26,6 +28,10 @@ const RestaurantPortalPage = () => {
 
   const toggleCreate = () => {
     setCreate(!create);
+  }
+
+  if (loading || !restaurants?.getAllRestaurants?.length) {
+    return <Typography>Loading...</Typography>;
   }
 
   return (

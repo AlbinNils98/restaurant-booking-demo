@@ -31,7 +31,7 @@ mutation AddReservation(
     tableId
     createdAt
   }
-}`
+}`;
 
 export const UPDATE_RESERVATION_MUTATION = gql`
 mutation UpdateReservation(
@@ -42,6 +42,7 @@ mutation UpdateReservation(
   $sittingStart: DateTime,
   $partySize: Int,
   $email: String,
+  $tableId: ObjectId
 ) {
   updateReservation(
     reservationId: $reservationId,
@@ -51,7 +52,13 @@ mutation UpdateReservation(
     sittingStart: $sittingStart,
     partySize: $partySize,
     email: $email
+    tableId: $tableId
   ) {
     _id
   }
-}`
+}`;
+
+export const REMOVE_RESERVATION_MUTATION = gql`
+mutation RemoveReservation($reservationId: ObjectId!) {
+  removeReservation(reservationId: $reservationId)
+}`;

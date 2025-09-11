@@ -18,7 +18,12 @@ type Mutation {
       message: String,
       partySize: Int,
       sittingStart: DateTime
+      tableId: ObjectId
     ): Reservation!
+
+    removeReservation(
+      reservationId: ObjectId!
+    ): Boolean!
 }
 
 type Query {
@@ -57,5 +62,5 @@ type ReservationDto {
   updatedAt: DateTime!
 
   # Calculated fields
-  tableName: String
+  table: Table!
 }

@@ -1,4 +1,4 @@
-import { QueryResolvers, ReservationDto } from '@/generated/graphql';
+import { QueryResolvers, ReservationDto, Table } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';
 import { ObjectId } from 'mongodb';
 
@@ -7,7 +7,7 @@ export const reservationQueryResolvers: QueryResolvers<GraphQLContext> = {
     const restaurantObjectId = new ObjectId(restaurantId);
     const reservationDocs = await reservations.find({ restaurantId: restaurantObjectId }).toArray();
     const tableDocs = await tables.find({ restaurantId: restaurantObjectId }).toArray();
-    // Map table IDs to table objects for easy lookup
+
     const tableMap = new Map(tableDocs.map(table => [table._id.toString(), table]));
 
     const reservationDtos: ReservationDto[] = reservationDocs.map(doc => {
@@ -27,7 +27,7 @@ export const reservationQueryResolvers: QueryResolvers<GraphQLContext> = {
         message: doc.message,
         createdAt: doc.createdAt,
         updatedAt: doc.updatedAt,
-        tableName: table?.name ?? null,
+        table: table || { _id: new ObjectId(), restaurantId: doc.restaurantId, name: "Unknown", seats: 0 } as Table,
       };
     });
 

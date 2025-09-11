@@ -3,15 +3,16 @@ import { GET_RESERVATIONS_BY_RESTAURANT_QUERY } from '../../../../graphql/query/
 import type { GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables } from '../../../../generated/graphql';
 import { Box, List, TextField, Typography } from '@mui/material';
 import ReservationListItem from './ReservationListItem';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import dayjs from 'dayjs';
 
 
 type ReservationsListProps = {
   restaurantId: string;
+  selectedDate?: dayjs.Dayjs | null;
 }
 
-const ReservationsList = ({ restaurantId }: ReservationsListProps) => {
+const ReservationsList = ({ restaurantId, selectedDate }: ReservationsListProps) => {
 
   const { data, loading } = useQuery<GetReservationsByRestaurantQuery, GetReservationsByRestaurantQueryVariables>(GET_RESERVATIONS_BY_RESTAURANT_QUERY, {
     variables: { restaurantId }
@@ -20,28 +21,40 @@ const ReservationsList = ({ restaurantId }: ReservationsListProps) => {
 
   const [searchTerm, setSearchTerm] = useState('');
 
+  const reservations = data?.getReservationsByRestaurant || [];
 
-  if (loading) return <Typography>Loading...</Typography>;
+  const dateFiltered = useMemo(() => {
+    return selectedDate
+      ? reservations.filter((r) => dayjs(r.sittingStart).isSame(selectedDate, 'day'))
+      : reservations;
+  }, [reservations, selectedDate]);
 
-  const filteredReservations = data?.getReservationsByRestaurant.filter((reservation) => {
+  const searchFiltered = useMemo(() => {
     const term = searchTerm.toLowerCase();
-    return (
+    return dateFiltered.filter((reservation) =>
       reservation.firstName.toLowerCase().includes(term) ||
       reservation.lastName.toLowerCase().includes(term) ||
       reservation.email.toLowerCase().includes(term) ||
       reservation.confirmationCode.toLowerCase().includes(term) ||
-      reservation.tableName?.toLowerCase().includes(term)
-
+      reservation.table.name?.toLowerCase().includes(term)
     );
-  }).sort((a, b) => dayjs(a.sittingStart).unix() - dayjs(b.sittingStart).unix()) || [];
+  }, [dateFiltered, searchTerm]);
 
+  const filteredReservations = useMemo(() => {
+    return [...searchFiltered].sort(
+      (a, b) =>
+        dayjs(b.sittingStart).unix() - dayjs(a.sittingStart).unix()
+    );
+  }, [searchFiltered]);
+
+  if (loading) return <Typography>Loading...</Typography>;
 
   return (
     <Box>
       <TextField
         fullWidth
         variant="outlined"
-        placeholder="Search by name, email, or confirmation code"
+        placeholder="Search by name, email, table name or confirmation code"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
         sx={{ mb: 2 }}
@@ -53,7 +66,7 @@ const ReservationsList = ({ restaurantId }: ReservationsListProps) => {
         ))}
       </List>
 
-      {filteredReservations.length === 0 && (
+      {!filteredReservations.length && (
         <Typography color="text.secondary" sx={{ mt: 2 }}>
           No reservations found.
         </Typography>

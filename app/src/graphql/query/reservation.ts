@@ -16,7 +16,14 @@ export const GET_RESERVATIONS_BY_RESTAURANT_QUERY = gql`
       message
       createdAt
       updatedAt
-      tableName
+      table {
+        _id
+        name
+        seats
+        restaurantId
+        createdAt
+        updatedAt
+      }
     }
   }
 `;

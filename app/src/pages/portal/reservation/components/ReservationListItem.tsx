@@ -1,9 +1,13 @@
 import { Box, Button, IconButton, ListItem, Stack, Typography } from '@mui/material';
-import type { ReservationDto } from '../../../../generated/graphql';
+import { type RemoveReservationMutation, type RemoveReservationMutationVariables, type ReservationDto } from '../../../../generated/graphql';
 import dayjs from 'dayjs';
 import { DeleteOutline } from '@mui/icons-material';
 import { useState } from 'react';
 import ReservationEdit from './ReservationEdit';
+import { useMutation } from '@apollo/client';
+import { REMOVE_RESERVATION_MUTATION } from '../../../../graphql/mutation/reservation';
+import { GET_RESERVATIONS_BY_RESTAURANT_QUERY } from '../../../../graphql/query/reservation';
+import ConfirmDialog from '../../../../components/Dialog';
 
 type ResertavionListItemProps = {
   reservation: ReservationDto;
@@ -12,6 +16,20 @@ type ResertavionListItemProps = {
 const ReservationListItem = ({ reservation }: ResertavionListItemProps) => {
   const [edit, setEdit] = useState(false);
   const toggleEdit = () => setEdit(!edit);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const [removeReservation] = useMutation<RemoveReservationMutation, RemoveReservationMutationVariables>(REMOVE_RESERVATION_MUTATION, {
+    refetchQueries: [{ query: GET_RESERVATIONS_BY_RESTAURANT_QUERY, variables: { restaurantId: reservation.restaurantId } }],
+    variables: { reservationId: reservation._id }
+  });
+
+  const handleRemove = () => {
+    setShowDeleteDialog(true);
+  };
+
+  const remove = () => {
+    removeReservation();
+  }
 
   return (
     <ListItem
@@ -19,10 +37,7 @@ const ReservationListItem = ({ reservation }: ResertavionListItemProps) => {
       sx={{ borderBottom: '1px solid #e0e0e0', py: 2, alignItems: 'flex-start', display: 'flex', justifyContent: 'space-between' }}
     >
       {edit ?
-        <ReservationEdit reservation={reservation} onAbort={toggleEdit} onSave={(updated) => {
-          console.log('Save', updated);
-          toggleEdit();
-        }} />
+        <ReservationEdit reservation={reservation} toggleEdit={toggleEdit} />
         :
         <Stack direction="row" alignItems="flex-start" flex={1} justifyContent="space-between">
           <Stack spacing={1} flex={1}>
@@ -39,14 +54,14 @@ const ReservationListItem = ({ reservation }: ResertavionListItemProps) => {
               </Typography>
             </Stack>
 
-            <Stack direction="row" spacing={2}>
-              <Typography variant="body2" color="text.secondary">
-                Table: {reservation.tableName || 'N/A'}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Confirmation Code: {reservation.confirmationCode}
-              </Typography>
-            </Stack>
+            <Typography variant="body2" color="text.secondary">
+              Confirmation Code: {reservation.confirmationCode}
+            </Typography>
+
+            <Typography variant="body2" color="text.secondary">
+              Table: {`${reservation.table.name} (seats: ${reservation.table.seats})` || 'N/A'}
+            </Typography>
+
 
             <Typography variant="body2" color="text.secondary">
               Email: {reservation.email}
@@ -65,12 +80,13 @@ const ReservationListItem = ({ reservation }: ResertavionListItemProps) => {
 
           <Stack direction="row" spacing={1} alignItems="flex-start">
             <Button variant="outlined" onClick={toggleEdit}>Edit</Button>
-            <IconButton>
+            <IconButton onClick={handleRemove}>
               <DeleteOutline color="error" />
             </IconButton>
           </Stack>
         </Stack>
       }
+      <ConfirmDialog text='Are you sure you want to delete this reservation?' open={showDeleteDialog} setOpen={setShowDeleteDialog} onConfirm={remove} onAbort={() => { }} />
     </ListItem>
   );
 }
