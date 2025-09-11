@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material';
 import { useState } from 'react';
-import { useBooking } from '../../../context/Booking';
-import SittingSelect from '../../../components/SittingSelect';
+import { useBooking } from '../../context/Booking';
+import SittingSelect from '../SittingSelect';
 
 type SittingPickerProps = {
   onClick: () => void;

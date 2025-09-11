@@ -1,6 +1,6 @@
 import { Button, TextField, Typography } from '@mui/material'
 import { useState } from 'react';
-import { useBooking } from '../../../context/Booking';
+import { useBooking } from '../../context/Booking';
 
 type PartySizeSelectProps = {
   onClick: () => void;
