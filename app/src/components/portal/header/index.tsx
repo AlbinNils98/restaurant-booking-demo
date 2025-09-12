@@ -1,10 +1,12 @@
-import { Box, Stack, Divider, Typography, Link as MuiLink, Button } from "@mui/material";
+import { Box, Stack, Divider, Typography, Link as MuiLink, Button, useTheme } from "@mui/material";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import { useAuth } from '../../../context/Auth';
+import ThemeToggleButton from '../../ThemeToggleButton';
 
 const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
+  const theme = useTheme();
 
   return (
     <MuiLink
@@ -22,7 +24,7 @@ const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode
           bottom: -2,
           height: 2,
           width: isActive ? "100%" : "0%",
-          bgcolor: "white",
+          bgcolor: theme.palette.text.primary,
           transition: "width 0.3s ease",
         },
         "&:hover::after": {
@@ -48,8 +50,8 @@ function HeaderLinks() {
 export function PortalHeader() {
   const { logout } = useAuth();
   return (
-    <Box bgcolor="grey.900" py={3} color="white" width="100%">
-      <Stack direction="row" alignItems="center">
+    <Box py={3} width="100%">
+      <Stack direction="row" alignItems="center" spacing={2}>
         <MuiLink
           component={RouterLink}
           to="/"
@@ -65,22 +67,16 @@ export function PortalHeader() {
         <HeaderLinks />
 
         <Button
-          variant="outlined"
+          variant="contained"
           size="small"
           onClick={logout}
           sx={{
             ml: 3,
-            borderColor: "white",
-            color: "white",
-            "&:hover": {
-              backgroundColor: "white",
-              color: "black",
-              borderColor: "white",
-            },
           }}
         >
           Logout
         </Button>
+        <ThemeToggleButton />
       </Stack>
       <Divider sx={{ mt: 2, bgcolor: "grey.600" }} />
     </Box>
