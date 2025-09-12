@@ -4,9 +4,12 @@ A full-stack demo application for managing restaurant bookings.
 ## Overview
 This monorepo contains:
 
-Server: Node.js, Express, GraphQL Yoga, TypeScript, GraphQL Code Generator
+### Server: 
+- Node.js, Express, GraphQL Yoga, TypeScript, GraphQL Code Generator
 
-App: Vite, React, TypeScript, Apollo Client, GraphQL Code Generator, MUI
+### App: 
+- Vite, React, TypeScript, Apollo Client, GraphQL Code Generator, MUI
+
 The goal is to demonstrate a modern TypeScript-based GraphQL stack with end-to-end type safety.
 
 ## Project Structure
@@ -22,7 +25,7 @@ Node.js 18 or later
 
 npm
 
-MongoDB
+MongoDB (local or cloud, e.g., MongoDB Atlas)
 
 ## Getting Started
 Clone the repository and install dependencies:
@@ -40,6 +43,48 @@ cp .env.example .env (update environment variables as needed)
 npm run dev (starts Express + GraphQL Yoga in watch mode)
 Runs on: http://localhost:4000
 ```
+
+#### Server Environment Variables
+
+The server requires the following environment variables. You should create a `.env` file in the `server/` folder based on the examples below.
+
+##### Development (`.env`)
+```
+NODE_ENV=development
+PORT=4000
+MONGO_URI=mongodb://localhost:27017
+DB_NAME=RestaurantDB
+
+JWT_SECRET=your_jwt_secret_here
+
+GMAILUSER=your_email@example.com
+
+GMAILPASS=your_gmail_app_password_here
+```
+##### Production (`.env.prod`)
+```
+NODE_ENV=production
+PORT=4000
+MONGO_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net
+DB_NAME=RestaurantDB
+
+JWT_SECRET=your_production_jwt_secret_here
+
+GMAILUSER=your_email@example.com
+
+GMAILPASS=your_gmail_app_password_here
+```
+
+**Notes:**
+- `NODE_ENV`: Set to `development` or `production`.  
+- `PORT`: Port the server will run on.  
+- `MONGO_URI`: Your MongoDB connection URI.  
+- `DB_NAME`: Name of the database.  
+- `JWT_SECRET`: Secret used for signing JWT tokens.  
+- `GMAILUSER`: Your Gmail email connected to the gmail app password.
+- `GMAILPASS`: A **Gmail App Password** generated for use with external apps (not your normal Gmail password).
+
+If using `NODE_ENV=development` the server seeds the database with example values. 
 
 - GraphQL endpoint: /graphql
 - Code generation: npm codegen
@@ -67,6 +112,8 @@ app | npm codegen | Generate GraphQL hooks/types for Apollo Client
 ```
 
 ## Tech Highlights
+
+- MongoDB – document database for booking data
 
 - GraphQL Yoga – simple, fast GraphQL server
 
