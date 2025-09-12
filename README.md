@@ -46,7 +46,7 @@ Runs on: http://localhost:4000
 
 #### Server Environment Variables
 
-The server requires the following environment variables. You should create a `.env` file in the `server/` folder based on the examples below.
+The server requires the following environment variables. You need to create a `.env` file in the `server/` folder based on the examples below.
 
 ##### Development (`.env.dev`)
 ```
@@ -113,19 +113,24 @@ app | npm codegen | Generate GraphQL hooks/types for Apollo Client
 
 ## Tech Highlights
 
-- MongoDB – document database for booking data
+### Server
+- **MongoDB** – document database for booking data
 
-- GraphQL Yoga – simple, fast GraphQL server
+- **GraphQL Yoga** – simple, fast GraphQL server
 
-- TypeScript – end-to-end type safety
+- **TypeScript** – end-to-end type safety
 
-- GraphQL Code Generator – auto-generates types and React hooks
+- **GraphQL Code Generator (Server)** – generates TypeScript types from GraphQL schemas, which are used for resolvers and also for defining MongoDB collections, ensuring backend type safety and consistency  
 
-- Vite – lightning-fast frontend tooling
+### App
 
-- Apollo Client – state management & GraphQL data fetching
+- **Vite** – lightning-fast frontend tooling
+  
+- **GraphQL Code Generator** – fetches types from the server schema to auto-generate TypeScript types and React hooks, ensuring full type safety on the frontend
 
-- MUI – UI component library
+- **Apollo Client** – state management & GraphQL data fetching
+
+- **MUI** – UI component library
 
 ## Deployment
 - Server: Build with npm build and deploy to your Node hosting of choice.
