@@ -30,7 +30,7 @@ MongoDB (local or cloud, e.g., MongoDB Atlas)
 ## Getting Started
 Clone the repository and install dependencies:
 ```
-git clone https://github.com/your-username/restaurant-booking-demo.git
+git clone https://github.com/AlbinNils98/restaurant-booking-demo.git
 cd restaurant-booking-demo
 npm install
 npm run husky
