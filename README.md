@@ -87,7 +87,6 @@ GMAILPASS=your_gmail_app_password_here
 If using `NODE_ENV=development` the server seeds the database with example values. 
 
 - GraphQL endpoint: /graphql
-- Code generation: npm codegen
 
 ### App
 ```
@@ -97,8 +96,22 @@ npm run dev
 Runs on: http://localhost:5173
 ```
 
-- Apollo Client configured to talk to http://localhost:5000/graphql
-- Code generation: pnpm codegen
+The Vite React app uses environment variables to configure things like the GraphQL endpoint. Create a `.env` file in the `app/` folder.
+
+### Development (`.env.development`)
+```
+VITE_API_URL=http://localhost:5000/graphql
+```
+
+### Production (`.env.production`)
+```
+VITE_API_URL=https://your-production-server.com/graphql
+```
+
+### Notes
+
+- All variables **must be prefixed with `VITE_`** to be exposed to the frontend.  
+- Access them in your React code using `import.meta.env`:
 
 ## Scripts
 ```
