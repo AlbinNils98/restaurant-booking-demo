@@ -36,7 +36,7 @@ const PartySizeSelect = ({ onClick }: PartySizeSelectProps) => {
       <Typography>How many people is the reservation for?</Typography>
 
       <TextField
-        label="Quantity"
+        label="Party size"
         type="number"
         value={partySize}
         onChange={(e) => setPartySize(e.target.value)}
@@ -48,7 +48,7 @@ const PartySizeSelect = ({ onClick }: PartySizeSelectProps) => {
       <Button
         onClick={handlePartySizeSelect}
         variant="contained"
-        fullWidth
+        sx={{ width: 200 }}
       >
         Next
       </Button>

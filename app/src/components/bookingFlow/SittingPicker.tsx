@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
 import { useBooking } from '../../context/Booking';
 import SittingSelect from '../SittingSelect';
@@ -19,7 +19,7 @@ export default function SittingPicker({ onClick }: SittingPickerProps) {
   }
 
   return (
-    <Box display="flex" flexDirection="column" gap={2}>
+    <Stack spacing={2}>
       <Typography>Select a date and time when you want to visit.</Typography>
 
       <SittingSelect
@@ -29,10 +29,10 @@ export default function SittingPicker({ onClick }: SittingPickerProps) {
         onChange={setValue}
       />
       {value && <Button
+        sx={{ width: 200, alignSelf: 'center' }}
         variant="contained"
-        fullWidth
         onClick={handleSelection}>Next</Button>
       }
-    </Box>
+    </Stack>
   );
 }
