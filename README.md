@@ -112,6 +112,7 @@ VITE_API_URL=https://your-production-server.com/graphql
 
 - All variables **must be prefixed with `VITE_`** to be exposed to the frontend.  
 - Access them in your React code using `import.meta.env`:
+- The apollo client is configured to fall back to ```http://localhost:5000/graphql``` if no VITE_API_URL
 
 ## Scripts
 ```
