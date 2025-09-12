@@ -48,7 +48,7 @@ Runs on: http://localhost:4000
 
 The server requires the following environment variables. You should create a `.env` file in the `server/` folder based on the examples below.
 
-##### Development (`.env`)
+##### Development (`.env.dev`)
 ```
 NODE_ENV=development
 PORT=4000
