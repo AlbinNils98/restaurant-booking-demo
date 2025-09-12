@@ -5,7 +5,7 @@ import MenuPage from "./pages/menu";
 import NotFoundPage from './pages/notFound';
 import Header from './components/header';
 import ContactPage from './pages/contact';
-import { Box, createTheme, CssBaseline, ThemeProvider } from '@mui/material';
+import { Box } from '@mui/material';
 import LoginPage from './pages/login';
 import { AuthProvider } from './context/Auth';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -39,50 +39,41 @@ const PortalLayout = () => {
 
 const App = () => {
 
-  const theme = createTheme({
-    palette: {
-      mode: 'dark',
-    },
-  });
-
   return (
-    <Box
-      minHeight="100vh"
-      width="100%"
-      maxWidth="1280px"
-      bgcolor="grey.900"
-      px={3}
-    >
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <CssBaseline />
-          <BrowserRouter>
-            <AuthProvider>
-              <ToastProvider>
-                <Routes>
-                  <Route element={<DefaultLayout />}>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/booking" element={<BookingPage />} />
-                    <Route path="/menu" element={<MenuPage />} />
-                    <Route path="/contact" element={<ContactPage />} />
-                    <Route path='/login' element={<LoginPage />} />
+
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Box
+        minHeight="100vh"
+        width="100%"
+        maxWidth="1280px"
+        px={3}
+      >
+        <BrowserRouter>
+          <AuthProvider>
+            <ToastProvider>
+              <Routes>
+                <Route element={<DefaultLayout />}>
+                  <Route path="/" element={<HomePage />} />
+                  <Route path="/booking" element={<BookingPage />} />
+                  <Route path="/menu" element={<MenuPage />} />
+                  <Route path="/contact" element={<ContactPage />} />
+                  <Route path='/login' element={<LoginPage />} />
+                </Route>
+                <Route path='/admin' element={<ProtectedRoute />} >
+                  <Route element={<PortalLayout />}>
+                    <Route index element={<MainPortalPage />} />
+                    <Route path='/admin/menus' element={<MenuPortalPage />} />
+                    <Route path='/admin/restaurants' element={<RestaurantPortalPage />} />
+                    <Route path='/admin/reservations' element={<ReservationPortalPage />} />
                   </Route>
-                  <Route path='/admin' element={<ProtectedRoute />} >
-                    <Route element={<PortalLayout />}>
-                      <Route index element={<MainPortalPage />} />
-                      <Route path='/admin/menus' element={<MenuPortalPage />} />
-                      <Route path='/admin/restaurants' element={<RestaurantPortalPage />} />
-                      <Route path='/admin/reservations' element={<ReservationPortalPage />} />
-                    </Route>
-                  </Route>
-                  <Route path="*" element={<NotFoundPage />} />
-                </Routes>
-              </ToastProvider>
-            </AuthProvider>
-          </BrowserRouter>
-        </LocalizationProvider>
-      </ThemeProvider>
-    </Box>
+                </Route>
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </ToastProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </Box>
+    </LocalizationProvider>
   );
 };
 

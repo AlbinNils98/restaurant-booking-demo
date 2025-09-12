@@ -7,6 +7,7 @@ import { GET_MENU_QUERY } from '../../../../graphql/query/restaurant';
 import { useMutation } from '@apollo/client';
 import { useToast } from '../../../../context/Toast';
 import ConfirmDialog from '../../../../components/Dialog';
+import { useThemeContext } from '../../../../context/Theme';
 
 type MenuItemAddProps = {
   restaurantId: string;
@@ -16,7 +17,7 @@ type MenuItemAddProps = {
 
 const MenuItemAdd = ({ restaurantId, toggleAddItem, addItem }: MenuItemAddProps) => {
   const { showToast } = useToast();
-
+  const { mode } = useThemeContext();
   const [newMenuItem, setNewMenuItem] = useState({
     restaurantId,
     categoryName: CategoryName.Appetizers,
@@ -99,7 +100,7 @@ const MenuItemAdd = ({ restaurantId, toggleAddItem, addItem }: MenuItemAddProps)
               label="Vegetarian"
               size="small"
               color={newMenuItem.vegetarian ? "success" : "error"}
-              variant="outlined"
+              variant={mode === "light" ? "filled" : "outlined"}
             />
           </ButtonBase>
           <TextField
