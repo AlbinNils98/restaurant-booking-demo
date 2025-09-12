@@ -63,7 +63,7 @@ const RestaurantSelect = ({ onClick }: RestaurantSelectProps) => {
           <Button
             onClick={handleSetRestaurant}
             variant="contained"
-            fullWidth
+            sx={{ width: 200 }}
           >
             Next
           </Button>

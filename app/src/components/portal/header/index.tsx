@@ -54,12 +54,12 @@ export function PortalHeader() {
       <Stack direction="row" alignItems="center" spacing={2}>
         <MuiLink
           component={RouterLink}
-          to="/"
+          to="/admin"
           underline="none"
           color="inherit"
           pl={1}
         >
-          <Typography variant="h6">RestaurantDemo</Typography>
+          <Typography variant="h6">Restaurant-Booking-Demo</Typography>
         </MuiLink>
 
         <Box flexGrow={1} />

@@ -1,4 +1,4 @@
-import { Box, Button, Step, StepLabel, Stepper } from '@mui/material';
+import { Box, Button, Stack, Step, StepLabel, Stepper } from '@mui/material';
 import { useState } from 'react';
 import Confirmation from './Confirmation';
 import { useBooking } from '../../context/Booking';
@@ -48,7 +48,7 @@ const BookingFlow = () => {
   return (
     <Box
       component="form"
-      maxWidth={400}
+      maxWidth={600}
       mx="auto"
       mt={5}
       p={3}
@@ -66,7 +66,10 @@ const BookingFlow = () => {
         ))}
       </Stepper>
 
-      {renderStepContent()}
+      <Stack maxWidth={500} spacing={2} alignSelf="center" alignItems="center">
+        {renderStepContent()}
+
+      </Stack>
 
       <Box display="flex" justifyContent="space-between" mt={2}>
         {activeStep < 4 && <Button disabled={activeStep === 0} onClick={handleBack}>
