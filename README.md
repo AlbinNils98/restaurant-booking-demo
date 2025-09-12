@@ -132,6 +132,16 @@ app | npm codegen | Generate GraphQL hooks/types for Apollo Client
 
 - **MUI** – UI component library
 
+## Development Tools & Pre-Commit Hooks
+
+- **Husky** – used for Git pre-commit hooks to enforce code quality.
+- **Pre-commit hook behavior**:  
+  - Runs TypeScript compilation (`tsc`) on the entire `src` folder to catch type errors.  
+  - Runs ESLint on the entire `src` folder to enforce coding standards.  
+- **Scope**: The hook runs for both `server` and `app` directories, ensuring consistent type safety and linting across the whole monorepo.
+
+> This ensures that commits do not introduce type errors or linting issues in either the backend or frontend code.
+
 ## Deployment
 - Server: Build with npm build and deploy to your Node hosting of choice.
 - App: Build with npm build and serve the static files (for example Vercel or Netlify).
