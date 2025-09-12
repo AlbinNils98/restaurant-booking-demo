@@ -95,24 +95,32 @@ npm run install
 npm run dev
 Runs on: http://localhost:5173
 ```
-
+#### App Environment Variables
 The Vite React app uses environment variables to configure things like the GraphQL endpoint. Create a `.env` file in the `app/` folder.
 
-### Development (`.env.development`)
+##### Development (`.env.development`)
 ```
 VITE_API_URL=http://localhost:5000/graphql
 ```
 
-### Production (`.env.production`)
+##### Production (`.env.production`)
 ```
 VITE_API_URL=https://your-production-server.com/graphql
 ```
 
-### Notes
-
+**Notes:**
 - All variables **must be prefixed with `VITE_`** to be exposed to the frontend.  
 - Access them in your React code using `import.meta.env`:
 - The apollo client is configured to fall back to ```http://localhost:5000/graphql``` if no VITE_API_URL
+
+#### Frontend Codegen Configuration
+
+The frontend uses **GraphQL Code Generator** to generate TypeScript types and React hooks from the server schema.  
+
+##### Important
+
+- Make sure your `codegen.yml` in the `client/` folder points to the **correct backend GraphQL endpoint**.  
+- As of now it points to ```http://localhost:5000/graphql```
 
 ## Scripts
 ```
