@@ -1,5 +1,5 @@
 import { Card, CardContent, Divider, List, Typography } from '@mui/material';
-import type { GetMenuQuery, MenuItem } from '../../generated/graphql';
+import { CategoryName, type GetMenuQuery, type MenuItem } from '../../generated/graphql';
 
 type MenuDisplayProps = {
   menu: GetMenuQuery | undefined;
@@ -9,9 +9,26 @@ type MenuDisplayProps = {
 export const MenuDisplay = ({ menu, RowComponent }: MenuDisplayProps) => {
   if (!menu) return null;
 
+  const categoryOrder = [
+    CategoryName.Appetizers,
+    CategoryName.Breakfast,
+    CategoryName.Lunch,
+    CategoryName.Dinner,
+    CategoryName.Desserts,
+    CategoryName.Drinks,
+  ];
+
+  const orderMap = Object.fromEntries(categoryOrder.map((c, i) => [c, i]));
+
+  const sortedMenu = [...menu.getMenu].sort((a, b) => {
+    const orderA = orderMap[a.category as CategoryName] ?? categoryOrder.length;
+    const orderB = orderMap[b.category as CategoryName] ?? categoryOrder.length;
+    return orderA - orderB;
+  });
+
   return (
     <div style={{ marginTop: 24 }}>
-      {menu.getMenu.map(
+      {sortedMenu.map(
         (category) =>
           category.items.length > 0 && (
             <Card key={category.category} variant="outlined" style={{ marginBottom: 24 }}>

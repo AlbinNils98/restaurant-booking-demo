@@ -39,7 +39,7 @@ const UnderlineLink = ({ to, children }: { to: string; children: React.ReactNode
 function HeaderLinks() {
   return (
     <Stack direction="row" spacing={4} alignItems="center">
-      <UnderlineLink to="/menu">Menu</UnderlineLink>
+      <UnderlineLink to="/menus">Menus</UnderlineLink>
       <UnderlineLink to="/booking">Book a table</UnderlineLink>
       <UnderlineLink to="/contact">Contact</UnderlineLink>
     </Stack>

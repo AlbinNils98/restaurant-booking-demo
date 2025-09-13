@@ -55,7 +55,7 @@ const App = () => {
                 <Route element={<DefaultLayout />}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/booking" element={<BookingPage />} />
-                  <Route path="/menu" element={<MenuPage />} />
+                  <Route path="/menus" element={<MenuPage />} />
                   <Route path="/contact" element={<ContactPage />} />
                   <Route path='/login' element={<LoginPage />} />
                 </Route>

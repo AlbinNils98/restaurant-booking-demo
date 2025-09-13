@@ -1,5 +1,5 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { Box, Button, Stack } from '@mui/material'
+import { Box, Button, Stack, Typography } from '@mui/material'
 import { useEffect, useState } from 'react';
 import { GET_ALL_RESTAURANTS_QUERY, GET_MENU_QUERY } from '../../../graphql/query/restaurant';
 import { type GetAllRestaurantsQuery, type GetMenuQuery, type GetMenuQueryVariables, type MenuItem } from '../../../generated/graphql';
@@ -37,14 +37,17 @@ const MenuPortalPage = () => {
 
   return (
     <Box sx={{ maxWidth: 800, margin: "0 auto", paddingBottom: 4 }}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+      <Typography variant="h4" gutterBottom>
+        Menus
+      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="end" mb={2}>
         <RestaurantSelect
           data={restaurants}
           selectedRestaurant={selectedRestaurant}
           setSelectedRestaurant={setSelectedRestaurant}
         />
 
-        {!addItem && <Button variant='outlined' onClick={toggleAddItem} sx={{ mt: 2, mb: 2 }}>Add item</Button>}
+        {!addItem && <Button variant='outlined' onClick={toggleAddItem}>Add item</Button>}
       </Stack>
 
       {addItem && <MenuItemAdd restaurantId={selectedRestaurant} toggleAddItem={toggleAddItem} addItem={addItem} />}

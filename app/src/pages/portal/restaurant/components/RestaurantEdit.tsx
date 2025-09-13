@@ -181,8 +181,8 @@ const RestaurantEdit = ({ restaurant }: RestaurantEditProps) => {
               ) : (
                 <>
                   <Typography fontWeight='bold'>{`Opening Hours: ${restaurant.openingHours.open} - ${restaurant.openingHours.close}`}</Typography>
-                  <Stack direction="row" spacing={1} flexWrap="wrap">
-                    <Typography mr={0.5} fontWeight='bold'>Opening Days:</Typography>
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap">
+                    <Typography mr={0.5} fontWeight='bold'>Days open:</Typography>
                     {restaurant.openingDays.map((day) => (
                       <Chip
                         key={day}

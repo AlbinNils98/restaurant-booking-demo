@@ -7,6 +7,7 @@ import { GET_MENU_QUERY } from '../../../../graphql/query/restaurant';
 import { DeleteOutline } from '@mui/icons-material';
 import ConfirmDialog from '../../../../components/Dialog';
 import MenuItemRowView from '../../../../components/menu/MenuItemRowView';
+import { useToast } from '../../../../context/Toast';
 
 type MenuItemRowProps = {
   item: MenuItem;
@@ -19,12 +20,14 @@ const MenuItemRow = ({ item, restaurantId = "" }: MenuItemRowProps) => {
     itemId: item._id,
     vegetarian: item.vegetarian,
   })
+  const { showToast } = useToast();
   const [edit, setEdit] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showSaveDialog, setShowSaveDialog] = useState(false);
 
   const [updateMenuItemMutation] = useMutation<UpdateMenuItemMutation, UpdateMenuItemMutationVariables>(UPDATE_MENU_ITEM_MUTATION, {
     onCompleted: () => {
+      showToast('Menu item updated successfully', 'success');
       setEdit(false);
     },
     refetchQueries: [

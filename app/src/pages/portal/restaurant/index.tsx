@@ -35,12 +35,15 @@ const RestaurantPortalPage = () => {
   }
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "0 auto" }}>
+    <Box sx={{ maxWidth: 800, margin: "0 auto", pb: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Restaurants
+      </Typography>
       {create ?
         <RestaurantCreate toggleCreate={toggleCreate} />
         :
         <>
-          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+          <Stack direction="row" justifyContent="space-between" alignItems="end" mb={2}>
             <RestaurantSelect data={restaurants} selectedRestaurant={selectedRestaurant} setSelectedRestaurant={setSelectedRestaurant} />
             <Button size='small' variant="outlined" onClick={toggleCreate}>Add Restaurant</Button>
           </Stack>

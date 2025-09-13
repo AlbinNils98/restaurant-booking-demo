@@ -29,7 +29,7 @@ const HomePage = () => {
           variant="contained"
           color="primary"
           component={RouterLink}
-          to="/menu"
+          to="/menus"
         >
           Menus
         </Button>

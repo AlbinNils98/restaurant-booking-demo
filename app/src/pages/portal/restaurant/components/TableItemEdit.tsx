@@ -6,6 +6,7 @@ import ConfirmDialog from '../../../../components/Dialog';
 import { useMutation } from '@apollo/client';
 import { REMOVE_TABLE_MUTATION, UNDO_TABLE_REMOVAL_MUTATION, UPDATE_TABLE_MUTATION } from '../../../../graphql/mutation/table';
 import { GET_TABLES_QUERY } from '../../../../graphql/query/tables';
+import { useToast } from '../../../../context/Toast';
 
 type TableItemEditProps = {
   table: Table;
@@ -13,6 +14,8 @@ type TableItemEditProps = {
 
 const TableItemEdit = ({ table }: TableItemEditProps) => {
   const [edit, setEdit] = useState(false);
+  const { showToast } = useToast();
+
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [showRemoveDialog, setShowRemoveDialog] = useState(false);
   const [showUndoDialog, setShowUndoDialog] = useState(false);
@@ -26,12 +29,20 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
     seats?: string;
   }>({});
 
+  const toggleEdit = () => {
+    setEdit(!edit);
+  };
+
   const [updateTable] = useMutation<UpdateTableMutation, UpdateTableMutationVariables>(UPDATE_TABLE_MUTATION,
     {
       variables: { tableId: table._id },
       refetchQueries: [
         { query: GET_TABLES_QUERY, variables: { restaurantId: table.restaurantId } },
       ],
+      onCompleted: () => {
+        showToast('Table updated successfully', 'success');
+        toggleEdit();
+      }
     }
   );
 
@@ -51,10 +62,6 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
         { query: GET_TABLES_QUERY, variables: { restaurantId: table.restaurantId } },
       ],
     });
-
-  const toggleEdit = () => {
-    setEdit(!edit);
-  };
 
   useEffect(() => {
     if (!edit) {
