@@ -119,7 +119,7 @@ The frontend uses **GraphQL Code Generator** to generate TypeScript types and Re
 
 ##### Important
 
-- Make sure your `codegen.yml` in the `client/` folder points to the **correct backend GraphQL endpoint**.  
+- Make sure your `codegen.yml` in the `app/` folder points to the **correct backend GraphQL endpoint**.  
 - As of now it points to ```http://localhost:5000/graphql```
 
 ## Scripts
