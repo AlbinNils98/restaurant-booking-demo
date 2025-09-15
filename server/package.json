@@ -3,7 +3,12 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "build": "tsc",
+    "build:ts": "tsc",
+    "build:aliases": "tsc-alias",
+    "copy:email-templates": "cp -r src/email/templates dist/src/email/",
+    "copy:gql-schemas": "cp -r src/schema dist/src/",
+    "copy:all": "npm run copy:email-templates && npm run copy:gql-schemas",
+    "build": "npm run build:ts && npm run build:aliases && npm run copy:all",
     "start": "cross-env NODE_ENV=production node dist/index.js",
     "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register --respawn index.ts",
     "codegen": "graphql-codegen --config codegen.ts"
@@ -26,6 +31,7 @@
     "@types/nodemailer": "^6.4.17",
     "cross-env": "^10.0.0",
     "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.9.2"
   },

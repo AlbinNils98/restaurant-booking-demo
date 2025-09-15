@@ -8,10 +8,10 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
 
-    "baseUrl": "src",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["*"]
+      "@/*": ["src/*"]
   }
 },
-    "include": ["**/*.ts"]
+    "include": ["index.ts", "src/**/*.ts"]
 }
