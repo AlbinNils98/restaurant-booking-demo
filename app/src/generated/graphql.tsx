@@ -307,6 +307,7 @@ export type Table = {
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
   name: Scalars['String']['output'];
+  removalDate?: Maybe<Scalars['DateTime']['output']>;
   removed?: Maybe<Scalars['Boolean']['output']>;
   removedAt?: Maybe<Scalars['DateTime']['output']>;
   restaurantId: Scalars['ObjectId']['output'];
@@ -520,7 +521,7 @@ export type GetTablesQueryVariables = Exact<{
 }>;
 
 
-export type GetTablesQuery = { __typename?: 'Query', getTables: Array<{ __typename?: 'Table', _id: string, restaurantId: string, name: string, seats: number, createdAt: string, updatedAt: string, removed?: boolean | null, removedAt?: string | null }> };
+export type GetTablesQuery = { __typename?: 'Query', getTables: Array<{ __typename?: 'Table', _id: string, restaurantId: string, name: string, seats: number, createdAt: string, updatedAt: string, removed?: boolean | null, removedAt?: string | null, removalDate?: string | null }> };
 
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1353,6 +1354,7 @@ export const GetTablesDocument = gql`
     updatedAt
     removed
     removedAt
+    removalDate
   }
 }
     `;

@@ -8,6 +8,7 @@ import { useMutation } from '@apollo/client';
 import { REMOVE_RESERVATION_MUTATION } from '../../../../graphql/mutation/reservation';
 import { GET_RESERVATIONS_BY_RESTAURANT_QUERY } from '../../../../graphql/query/reservation';
 import ConfirmDialog from '../../../../components/Dialog';
+import { useToast } from '../../../../context/Toast';
 
 type ResertavionListItemProps = {
   reservation: ReservationDto;
@@ -17,10 +18,15 @@ const ReservationListItem = ({ reservation }: ResertavionListItemProps) => {
   const [edit, setEdit] = useState(false);
   const toggleEdit = () => setEdit(!edit);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const { showToast } = useToast();
 
   const [removeReservation] = useMutation<RemoveReservationMutation, RemoveReservationMutationVariables>(REMOVE_RESERVATION_MUTATION, {
-    refetchQueries: [{ query: GET_RESERVATIONS_BY_RESTAURANT_QUERY, variables: { restaurantId: reservation.restaurantId } }],
-    variables: { reservationId: reservation._id }
+    refetchQueries: [{
+      query: GET_RESERVATIONS_BY_RESTAURANT_QUERY,
+      variables: { restaurantId: reservation.restaurantId }
+    }],
+    variables: { reservationId: reservation._id },
+    onCompleted: () => showToast('Reservation removed successfully', 'success'),
   });
 
   const handleRemove = () => {

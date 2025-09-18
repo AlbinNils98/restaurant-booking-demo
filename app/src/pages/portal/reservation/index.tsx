@@ -34,7 +34,10 @@ const ReservationPortalPage = () => {
 
 
   return (
-    <Box sx={{ maxWidth: 800, margin: "0 auto", paddingBottom: 4 }}>
+    <Box sx={{ maxWidth: 800, margin: "0 auto", pb: 2 }}>
+      <Typography variant="h4" gutterBottom>
+        Reservations
+      </Typography>
       {!create ?
         <Box>
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>

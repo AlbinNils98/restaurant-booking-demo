@@ -5,6 +5,7 @@ import type { AddTableMutation, AddTableMutationVariables } from '../../../../ge
 import { useState } from 'react';
 import { ADD_TABLE_MUTATION } from '../../../../graphql/mutation/table';
 import ConfirmDialog from '../../../../components/Dialog';
+import { useToast } from '../../../../context/Toast';
 
 type TableItemCreateProps = {
   restaurantId: string;
@@ -13,6 +14,7 @@ type TableItemCreateProps = {
 
 const TableItemCreate = ({ restaurantId, toggleCreate }: TableItemCreateProps) => {
   const [showSaveDialog, setShowSaveDialog] = useState(false);
+  const { showToast } = useToast();
 
   const [tableData, setTableData] = useState<AddTableMutationVariables>({
     restaurantId,
@@ -32,6 +34,10 @@ const TableItemCreate = ({ restaurantId, toggleCreate }: TableItemCreateProps) =
       refetchQueries: [
         { query: GET_TABLES_QUERY, variables: { restaurantId } },
       ],
+      onCompleted: () => {
+        showToast('Table added successfully', 'success');
+        toggleCreate();
+      }
     }
   );
 

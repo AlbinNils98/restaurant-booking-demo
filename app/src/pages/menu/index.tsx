@@ -31,7 +31,7 @@ const MenuPage = () => {
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", paddingBottom: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Menu
+        Menus
       </Typography>
 
       <RestaurantSelect

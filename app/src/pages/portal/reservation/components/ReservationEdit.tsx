@@ -8,6 +8,7 @@ import { UPDATE_RESERVATION_MUTATION } from '../../../../graphql/mutation/reserv
 import { GET_RESERVATIONS_BY_RESTAURANT_QUERY } from '../../../../graphql/query/reservation';
 import { GET_TABLES_FOR_SITTING_QUERY } from '../../../../graphql/query/restaurant';
 import dayjs from 'dayjs';
+import { useToast } from '../../../../context/Toast';
 
 type EditReservationProps = {
   reservation: ReservationDto;
@@ -20,6 +21,7 @@ const ReservationEdit = ({ reservation, toggleEdit }: EditReservationProps) => {
   });
   const [showSaveDialog, setShowSaveDialog] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { showToast } = useToast();
 
   const [updateReservation, { loading: updateLoading }] = useMutation<UpdateReservationMutation, UpdateReservationMutationVariables>(UPDATE_RESERVATION_MUTATION, {
     refetchQueries: [
@@ -28,7 +30,10 @@ const ReservationEdit = ({ reservation, toggleEdit }: EditReservationProps) => {
       }],
     variables: reservationData,
     onError: (err) => setError(err.message),
-    onCompleted: () => toggleEdit(),
+    onCompleted: () => {
+      showToast('Reservation updated successfully', 'success');
+      toggleEdit();
+    },
   });
 
   const { data: tables, loading: tableLoad } = useQuery<GetTablesForSittingQuery, GetTablesForSittingQueryVariables>(GET_TABLES_FOR_SITTING_QUERY, {
