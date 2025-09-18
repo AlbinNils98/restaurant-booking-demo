@@ -1,7 +1,7 @@
 import { Box, Button, Chip, IconButton, Stack, TextField, Typography } from '@mui/material';
 import type { RemoveTableMutation, RemoveTableMutationVariables, Table, UndoTableRemovalMutation, UndoTableRemovalMutationVariables, UpdateTableMutation, UpdateTableMutationVariables } from '../../../../generated/graphql';
 import { useEffect, useState } from 'react';
-import { DeleteOutline, UndoOutlined } from '@mui/icons-material';
+import { DeleteOutline, ErrorOutline, UndoOutlined } from '@mui/icons-material';
 import ConfirmDialog from '../../../../components/Dialog';
 import { useMutation } from '@apollo/client';
 import { REMOVE_TABLE_MUTATION, UNDO_TABLE_REMOVAL_MUTATION, UPDATE_TABLE_MUTATION } from '../../../../graphql/mutation/table';
@@ -153,7 +153,8 @@ const TableItemEdit = ({ table }: TableItemEditProps) => {
                   Seats: {table.seats}
                 </Typography>
               </Box>
-              {table.removedAt && <Chip color='error' label={`To be removed ${new Date(table.removedAt).toLocaleDateString()}`} />}
+              {table.removalDate && <Chip color='error' icon={<ErrorOutline />} label={
+                `To be removed ${new Date(table.removalDate).toLocaleDateString()}`} />}
             </Stack>
           }
         </Box>

@@ -11,6 +11,7 @@ query GetTables($restaurantId: ObjectId!) {
     updatedAt
     removed
     removedAt
+    removalDate
   }
 }
 `;
