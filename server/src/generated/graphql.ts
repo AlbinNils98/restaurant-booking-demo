@@ -307,6 +307,7 @@ export type Table = {
   _id: Scalars['ObjectId']['output'];
   createdAt: Scalars['DateTime']['output'];
   name: Scalars['String']['output'];
+  removalDate?: Maybe<Scalars['DateTime']['output']>;
   removed?: Maybe<Scalars['Boolean']['output']>;
   removedAt?: Maybe<Scalars['DateTime']['output']>;
   restaurantId: Scalars['ObjectId']['output'];
@@ -657,6 +658,7 @@ export type TableResolvers<ContextType = any, ParentType extends ResolversParent
   _id?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  removalDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   removed?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, ContextType>;
   removedAt?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
   restaurantId?: Resolver<ResolversTypes['ObjectId'], ParentType, ContextType>;

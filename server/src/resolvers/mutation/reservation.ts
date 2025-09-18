@@ -74,7 +74,7 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
     // Pick the first table that fits the party size and isn't reserved
     const availableTable = await tables.findOne({
       restaurantId: restaurant._id,
-      seats: { $gte: partySize },
+      seats: { $gte: partySize, $lte: partySize + 2 },
       _id: { $nin: reservedTableIds.map(id => new ObjectId(id)) },
     });
 
@@ -204,7 +204,7 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
         const requestedTable = await tables.findOne({
           _id: new ObjectId(tableId),
           restaurantId: restaurant._id,
-          seats: { $gte: partySize || reservation.partySize },
+          seats: { $gte: partySize || reservation.partySize, $lte: (partySize || reservation.partySize) + 2 },
         });
         if (!requestedTable) throw new GraphQLError("Requested table is not available for this sitting");
         finalTableId = requestedTable._id;
@@ -212,7 +212,7 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
         // Otherwise, auto-assign first available table
         const availableTable = await tables.findOne({
           restaurantId: restaurant._id,
-          seats: { $gte: partySize || reservation.partySize },
+          seats: { $gte: partySize || reservation.partySize, $lte: (partySize || reservation.partySize) + 2 },
           _id: { $nin: reservedTableIds.map(id => new ObjectId(id)) }
         });
         if (!availableTable) throw new GraphQLError("No tables available for this sitting");
@@ -266,7 +266,7 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
       // If only party size changed, check current table
       const table = await tables.findOne({ _id: reservation.tableId });
       if (!table) throw new GraphQLError("Table not found");
-      if (table.seats < partySize) {
+      if (table.seats < partySize || table.seats > partySize + 2) {
         throw new GraphQLError("Current table cannot accommodate the new party size. Choose a new sitting and or table.");
       }
     }
@@ -299,7 +299,7 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
       })
     ).catch(() => {
       throw new GraphQLError(
-        "Failed to confirm reservation via email, please contact the restaurant directly or try again later."
+        "Failed to send update confirmation via email, please contact the customer directly instead."
       );
     });
 
