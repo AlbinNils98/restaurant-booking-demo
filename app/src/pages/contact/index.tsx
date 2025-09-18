@@ -1,33 +1,61 @@
+import { useMutation } from '@apollo/client';
 import { Phone } from '@mui/icons-material';
-import { Alert, Box, Button, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Stack, TextField, Typography } from '@mui/material';
 import { useState } from 'react';
+import type { SendContactEmailMutation, SendContactEmailMutationVariables } from '../../generated/graphql';
+import { SEND_CONTACT_EMAIL_MUTATION } from '../../graphql/mutation/contact';
+import { useToast } from '../../context/Toast';
 
 const ContactPage = () => {
-  const [formData, setFormData] = useState({
+  const { showToast } = useToast();
+
+  const [formData, setFormData] = useState<SendContactEmailMutationVariables>({
     name: "",
     email: "",
     message: "",
   });
 
+  const [serverError, setServerErrorMessage] = useState<string | null>(null);
   const [errors, setErrors] = useState<{ name?: string; email?: string; message?: string }>({});
-  const [submitted, setSubmitted] = useState(false);
+  const maxNameLength = 32;
+  const maxMessageLength = 1000;
+  const maxEmailLength = 254;
+
+
+  const [sendContactEmail, { loading }] = useMutation<SendContactEmailMutation, SendContactEmailMutationVariables>(SEND_CONTACT_EMAIL_MUTATION, {
+    onCompleted: () => {
+      setServerErrorMessage(null);
+      showToast('Message sent!', 'success');
+      setFormData({
+        name: '',
+        email: '',
+        message: ''
+      })
+    },
+    onError: (error) => setServerErrorMessage(error.message)
+  });
+
 
   const validate = () => {
     const newErrors: typeof errors = {};
     if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (formData.name.length > maxNameLength) newErrors.name = 'Name cannot contain more than 32 characters'
     if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = "Invalid email";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = "Invalid email format";
     if (!formData.message.trim()) newErrors.message = "Message is required";
+    if (formData.message.length > maxMessageLength) newErrors.message = "Message cannot contain more than 1000 characters";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
+
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
-    console.log("Form submitted", formData);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", message: "" });
+
+    sendContactEmail({ variables: formData });
   };
 
   return (
@@ -44,45 +72,54 @@ const ContactPage = () => {
         Contact
       </Typography>
 
-      {submitted && <Alert severity="success" sx={{ mb: 2 }}>Your message has been sent!</Alert>}
+      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <Stack>
+          <TextField
+            label="Name"
+            fullWidth
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            slotProps={{ htmlInput: { maxLength: maxNameLength } }}
+            error={!!errors.name}
+            helperText={errors.name}
+          />
+          <CharacterCounter currentLength={formData.name.length} maxLength={maxNameLength} />
+        </Stack>
 
-      <form onSubmit={handleSubmit}>
-        <TextField
-          label="Name"
-          fullWidth
-          margin="normal"
-          value={formData.name}
-          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          error={!!errors.name}
-          helperText={errors.name}
-        />
+        <Stack>
+          <TextField
+            label="Email"
+            fullWidth
+            helperText={errors.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            slotProps={{ htmlInput: { maxLength: maxEmailLength } }}
+            value={formData.email}
+            error={!!errors.email}
+          />
+          <CharacterCounter currentLength={formData.email.length} maxLength={maxEmailLength} />
 
-        <TextField
-          label="Email"
-          type="email"
-          fullWidth
-          margin="normal"
-          value={formData.email}
-          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          error={!!errors.email}
-          helperText={errors.email}
-        />
+        </Stack>
+        <Stack>
+          <TextField
+            label="Message"
+            multiline
+            minRows={4}
+            fullWidth
+            value={formData.message}
+            onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+            slotProps={{ htmlInput: { maxLength: maxMessageLength } }}
+            error={!!errors.message}
+            helperText={errors.message}
+          />
+          <CharacterCounter currentLength={formData.message.length} maxLength={maxMessageLength} />
 
-        <TextField
-          label="Message"
-          multiline
-          minRows={4}
-          fullWidth
-          margin="normal"
-          value={formData.message}
-          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-          error={!!errors.message}
-          helperText={errors.message}
-        />
+        </Stack>
 
-        <Button type="submit" variant="contained" color="primary" fullWidth sx={{ mt: 2 }}>
+        {loading ? <CircularProgress sx={{ alignSelf: 'center' }} /> : <Button type="submit" variant="contained" color="primary" fullWidth>
           Send Message
-        </Button>
+        </Button>}
+        {serverError && <Typography color='error' alignSelf='center' border='solid 2px' borderRadius={1} p={1}>{serverError}</Typography>}
+
       </form>
 
       <Stack direction="row" alignItems="center" spacing={1.5} mt={3}>
@@ -106,5 +143,17 @@ const ContactPage = () => {
     </Box >
   );
 };
+
+const CharacterCounter = ({ currentLength, maxLength }: { currentLength: number, maxLength: number }) => {
+  return (
+    <Typography
+      variant="caption"
+      color={currentLength === maxLength ? 'error' : 'textSecondary'}
+      sx={{ display: 'block', textAlign: 'right', mt: 0.5 }}
+    >
+      {currentLength}/{maxLength}
+    </Typography>
+  );
+}
 
 export default ContactPage;
