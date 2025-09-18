@@ -22,7 +22,6 @@ type Query {
   getTables(restaurantId: ObjectId!): [Table!]!
 }
 
-
 type Table {
   _id: ObjectId!
   restaurantId: ObjectId!
@@ -32,4 +31,8 @@ type Table {
   updatedAt: DateTime!
   removedAt: DateTime
   removed: Boolean
+
+
+  # Calculated fields
+  removalDate: DateTime
 }
