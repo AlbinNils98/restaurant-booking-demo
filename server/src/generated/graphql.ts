@@ -53,6 +53,7 @@ export type Mutation = {
   removeMenuItem: Scalars['Boolean']['output'];
   removeReservation: Scalars['Boolean']['output'];
   removeTable: Table;
+  sendContactEmail: Scalars['Boolean']['output'];
   signIn: AuthRes;
   signOut: AuthRes;
   undoTableRemoval: Table;
@@ -120,6 +121,13 @@ export type MutationRemoveReservationArgs = {
 
 export type MutationRemoveTableArgs = {
   tableId: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationSendContactEmailArgs = {
+  email: Scalars['String']['input'];
+  message: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -561,6 +569,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
   removeReservation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveReservationArgs, 'reservationId'>>;
   removeTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationRemoveTableArgs, 'tableId'>>;
+  sendContactEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSendContactEmailArgs, 'email' | 'message' | 'name'>>;
   signIn?: Resolver<ResolversTypes['authRes'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<ResolversTypes['authRes'], ParentType, ContextType>;
   undoTableRemoval?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUndoTableRemovalArgs, 'tableId'>>;
