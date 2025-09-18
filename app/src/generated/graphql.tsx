@@ -53,6 +53,7 @@ export type Mutation = {
   removeMenuItem: Scalars['Boolean']['output'];
   removeReservation: Scalars['Boolean']['output'];
   removeTable: Table;
+  sendContactEmail: Scalars['Boolean']['output'];
   signIn: AuthRes;
   signOut: AuthRes;
   undoTableRemoval: Table;
@@ -120,6 +121,13 @@ export type MutationRemoveReservationArgs = {
 
 export type MutationRemoveTableArgs = {
   tableId: Scalars['ObjectId']['input'];
+};
+
+
+export type MutationSendContactEmailArgs = {
+  email: Scalars['String']['input'];
+  message: Scalars['String']['input'];
+  name: Scalars['String']['input'];
 };
 
 
@@ -358,6 +366,15 @@ export type SignOutMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type SignOutMutation = { __typename?: 'Mutation', signOut: { __typename?: 'authRes', success: boolean } };
 
+export type SendContactEmailMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  email: Scalars['String']['input'];
+  message: Scalars['String']['input'];
+}>;
+
+
+export type SendContactEmailMutation = { __typename?: 'Mutation', sendContactEmail: boolean };
+
 export type AddReservationMutationVariables = Exact<{
   restaurantId: Scalars['ObjectId']['input'];
   firstName: Scalars['String']['input'];
@@ -595,6 +612,39 @@ export function useSignOutMutation(baseOptions?: Apollo.MutationHookOptions<Sign
 export type SignOutMutationHookResult = ReturnType<typeof useSignOutMutation>;
 export type SignOutMutationResult = Apollo.MutationResult<SignOutMutation>;
 export type SignOutMutationOptions = Apollo.BaseMutationOptions<SignOutMutation, SignOutMutationVariables>;
+export const SendContactEmailDocument = gql`
+    mutation sendContactEmail($name: String!, $email: String!, $message: String!) {
+  sendContactEmail(name: $name, email: $email, message: $message)
+}
+    `;
+export type SendContactEmailMutationFn = Apollo.MutationFunction<SendContactEmailMutation, SendContactEmailMutationVariables>;
+
+/**
+ * __useSendContactEmailMutation__
+ *
+ * To run a mutation, you first call `useSendContactEmailMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSendContactEmailMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [sendContactEmailMutation, { data, loading, error }] = useSendContactEmailMutation({
+ *   variables: {
+ *      name: // value for 'name'
+ *      email: // value for 'email'
+ *      message: // value for 'message'
+ *   },
+ * });
+ */
+export function useSendContactEmailMutation(baseOptions?: Apollo.MutationHookOptions<SendContactEmailMutation, SendContactEmailMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SendContactEmailMutation, SendContactEmailMutationVariables>(SendContactEmailDocument, options);
+      }
+export type SendContactEmailMutationHookResult = ReturnType<typeof useSendContactEmailMutation>;
+export type SendContactEmailMutationResult = Apollo.MutationResult<SendContactEmailMutation>;
+export type SendContactEmailMutationOptions = Apollo.BaseMutationOptions<SendContactEmailMutation, SendContactEmailMutationVariables>;
 export const AddReservationDocument = gql`
     mutation AddReservation($restaurantId: ObjectId!, $firstName: String!, $lastName: String!, $message: String, $sittingStart: DateTime!, $partySize: Int!, $email: String!) {
   addReservation(

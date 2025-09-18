@@ -23,11 +23,26 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       {children}
       <Snackbar
         open={open}
-        autoHideDuration={3000}
+        autoHideDuration={5000}
         onClose={() => setOpen(false)}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        sx={{
+          "& .MuiPaper-root": {
+            minWidth: 450,
+            fontSize: "1.2rem",
+            padding: "16px 24px",
+            borderRadius: "12px",
+            boxShadow: "0px 6px 16px rgba(0,0,0,0.2)",
+          },
+        }}
       >
-        <Alert severity={severity} onClose={() => setOpen(false)} sx={{ width: "100%" }}>
+        <Alert
+          severity={severity}
+          onClose={() => setOpen(false)}
+          sx={{
+            fontSize: "1.2rem",
+            padding: "12px 16px",
+          }}>
           {message}
         </Alert>
       </Snackbar>
