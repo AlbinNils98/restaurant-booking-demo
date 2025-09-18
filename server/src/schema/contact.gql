@@ -1,0 +1,8 @@
+
+type Mutation {
+  sendContactEmail(
+    name: String!,
+    email: String!,
+    message: String!
+  ): Boolean! @public
+}

@@ -3,6 +3,7 @@ import fs from 'fs';
 
 export enum EmailTemplate {
   CONFIRMATION = 'CONFIRMATION',
+  CONTACT = 'CONTACT',
 }
 
 type TemplateVariablesMap = {
@@ -14,12 +15,18 @@ type TemplateVariablesMap = {
     partySize: number;
     restaurantName: string;
   };
+  [EmailTemplate.CONTACT]: {
+    name: string;
+    email: string;
+    message: string;
+  };
 }
 
 export function getTemplate<T extends EmailTemplate>(templateType: T, variables: TemplateVariablesMap[T]): string {
 
   const templateMap: Record<EmailTemplate, string> = {
     [EmailTemplate.CONFIRMATION]: 'confirmation.html',
+    [EmailTemplate.CONTACT]: 'contact.html'
   };
 
   const fileName = templateMap[templateType];
