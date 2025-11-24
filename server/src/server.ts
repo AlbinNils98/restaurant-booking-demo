@@ -18,9 +18,24 @@ dotenv.config({ path: envFile });
 
 console.log("Enviroment:", process.env.NODE_ENV);
 
+const FRONTEND_URL = process.env.FRONTEND_URL;
+
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", req.headers.origin);
+  res.header("Access-Control-Allow-Credentials", "true");
+  res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+  if (req.method === "OPTIONS") {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 const uri = process.env.MONGO_URI as string;
 const dbName = process.env.DB_NAME as string;
@@ -61,6 +76,14 @@ export async function initServer() {
 
   const yoga = createYoga<GraphQLContext>({
     schema,
+    cors: {
+      origin: [
+        FRONTEND_URL ? FRONTEND_URL : "http://localhost:5173",
+      ],
+      credentials: true,
+      methods: ["GET", "POST", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization"]
+    },
     context: async ({ request, req, res }): Promise<GraphQLContext> => {
       const token = req.cookies?.access_token;
       const currentUser = getCurrentUser(token);
