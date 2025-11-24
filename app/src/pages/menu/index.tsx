@@ -12,21 +12,30 @@ const MenuPage = () => {
 
   const [selectedRestaurant, setSelectedRestaurant] = useState("");
 
-  const { data: restaurants } = useQuery<GetAllRestaurantsQuery>(GET_ALL_RESTAURANTS_QUERY);
+  const { data, loading } = useQuery<GetAllRestaurantsQuery>(GET_ALL_RESTAURANTS_QUERY);
 
   const [getMenu, { data: menu }] = useLazyQuery<GetMenuQuery, GetMenuQueryVariables>(GET_MENU_QUERY);
 
+  const restaurants = data?.getAllRestaurants ?? [];
+
   useEffect(() => {
-    if (restaurants?.getAllRestaurants?.length && !selectedRestaurant) {
-      setSelectedRestaurant(restaurants.getAllRestaurants[0]._id);
+    if (!selectedRestaurant && restaurants.length > 0) {
+      setSelectedRestaurant(restaurants[0]._id);
     }
-  }, [restaurants, selectedRestaurant]);
+  }, [restaurants]);
 
   useEffect(() => {
     if (selectedRestaurant) {
       getMenu({ variables: { restaurantId: selectedRestaurant } })
     }
   }, [selectedRestaurant])
+
+  if (loading) return <Typography>Loading...</Typography>;
+
+
+  if (restaurants.length === 0) {
+    return <Typography>No restaurants available</Typography>;
+  }
 
   return (
     <div style={{ maxWidth: 800, margin: "0 auto", paddingBottom: 4 }}>
@@ -35,7 +44,7 @@ const MenuPage = () => {
       </Typography>
 
       <RestaurantSelect
-        data={restaurants}
+        data={data}
         selectedRestaurant={selectedRestaurant}
         setSelectedRestaurant={setSelectedRestaurant}
       />

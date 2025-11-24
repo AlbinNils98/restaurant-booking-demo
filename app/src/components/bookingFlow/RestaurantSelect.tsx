@@ -18,59 +18,58 @@ type RestaurantSelectProps = {
 
 const RestaurantSelect = ({ onClick }: RestaurantSelectProps) => {
   const { formData, setFormData } = useBooking();
-  const { data, loading } = useQuery<GetAllRestaurantsQuery>(GET_ALL_RESTAURANTS_QUERY);
-  const [selectedRestaurant, setSelectedRestaurant] = useState(formData.restaurantId || undefined);
+  const { data, loading } = useQuery<GetAllRestaurantsQuery>(
+    GET_ALL_RESTAURANTS_QUERY
+  );
+  const [selectedRestaurant, setSelectedRestaurant] = useState(
+    formData.restaurantId || ""
+  );
 
-  const handleSetRestaurant = () => {
-    if (selectedRestaurant) {
-      setFormData({ restaurantId: selectedRestaurant })
-      onClick();
-    }
-
-  }
+  const restaurants = data?.getAllRestaurants ?? [];
 
   useEffect(() => {
-    if (!selectedRestaurant) {
-      setSelectedRestaurant(data?.getAllRestaurants[0]._id)
+    if (!selectedRestaurant && restaurants.length > 0) {
+      setSelectedRestaurant(restaurants[0]._id);
     }
-  }, [data])
+  }, [restaurants]);
 
   if (loading) return <Typography>Loading...</Typography>;
 
 
+  if (restaurants.length === 0) {
+    return <Typography>No restaurants available</Typography>;
+  }
+
+  const handleSetRestaurant = () => {
+    if (selectedRestaurant) {
+      setFormData({ restaurantId: selectedRestaurant });
+      onClick();
+    }
+  };
 
   return (
     <>
-      {data && (
-        <>
-          <Typography>Please choose a restaurant</Typography>
+      <Typography>Please choose a restaurant</Typography>
 
-          <FormControl fullWidth>
-            <InputLabel id="restaurant-label">Restaurant</InputLabel>
-            <Select
-              labelId="restaurant-label"
-              value={selectedRestaurant || data.getAllRestaurants[0]._id}
-              onChange={(e) => setSelectedRestaurant(e.target.value)}
-            >
-              {data.getAllRestaurants.map((restaurant) => (
-                <MenuItem key={restaurant._id} value={restaurant._id}>
-                  {restaurant.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+      <FormControl fullWidth>
+        <InputLabel id="restaurant-label">Restaurant</InputLabel>
+        <Select
+          labelId="restaurant-label"
+          value={selectedRestaurant}
+          onChange={(e) => setSelectedRestaurant(e.target.value)}
+        >
+          {restaurants.map((restaurant) => (
+            <MenuItem key={restaurant._id} value={restaurant._id}>
+              {restaurant.name}
+            </MenuItem>
+          ))}
+        </Select>
+      </FormControl>
 
-          <Button
-            onClick={handleSetRestaurant}
-            variant="contained"
-            sx={{ width: 200 }}
-          >
-            Next
-          </Button>
-        </>
-      )}
+      <Button onClick={handleSetRestaurant} variant="contained" sx={{ width: 200 }}>
+        Next
+      </Button>
     </>
   );
 };
-
 export default RestaurantSelect;

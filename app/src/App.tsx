@@ -17,6 +17,7 @@ import ReservationPortalPage from './pages/portal/reservation';
 import { ToastProvider } from './context/Toast';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { useEffect, useState } from 'react';
 
 
 const DefaultLayout = () => {
@@ -38,6 +39,13 @@ const PortalLayout = () => {
 };
 
 const App = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    wakeApi().then(() => setLoading(false));
+  }, []);
+
+  if (loading) return <div>Waking up render server, please wait...</div>
 
   return (
 
@@ -76,5 +84,28 @@ const App = () => {
     </LocalizationProvider>
   );
 };
+
+const wakeApi = async () => {
+  let ready = false;
+  let API_URL = import.meta.env.VITE_API_URL
+  while (!ready) {
+    try {
+      const res = await fetch(API_URL ? API_URL : 'http://localhost:5000/', {
+        method: 'GET',
+      });
+
+      if (res.ok) {
+        ready = true;
+      }
+
+    } catch (err) {
+      // Ignore and retry
+    }
+
+    if (!ready) {
+      await new Promise(r => setTimeout(r, 2000));
+    }
+  }
+}
 
 export default App;
