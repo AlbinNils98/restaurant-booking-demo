@@ -1,4 +1,4 @@
-import sendEmail from '@/email/emailService';
+import { sendEmail } from '@/email/emailService';
 import { EmailTemplate, getTemplate } from '@/email/templateLoader';
 import { MutationResolvers, Reservation } from '@/generated/graphql';
 import { GraphQLContext } from '@/graphql/context';

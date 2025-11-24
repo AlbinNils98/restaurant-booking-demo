@@ -1,24 +1,42 @@
 import nodemailer from 'nodemailer';
 
-export default async function sendEmail(recipient: string, subject: string, message: string, html?: string): Promise<void> {
+export async function sendEmail(
+  recipient: string,
+  subject: string,
+  message: string,
+  html?: string
+) {
+  const apiToken = process.env.MAILERSEND_API_TOKEN!;
 
-  const { MAILERSEND_SMTP_USER, MAILERSEND_SMTP_PASS } = process.env;
-
-  const transporter = nodemailer.createTransport({
-    host: 'smtp.mailersend.net',
-    port: 587,
-    secure: false,
-    auth: {
-      user: MAILERSEND_SMTP_USER,
-      pass: MAILERSEND_SMTP_PASS,
-    }
-  });
-
-  await transporter.sendMail({
-    from: `"RestaurantDemo" <no-reply@test-r83ql3pmr3mgzw1j.mlsender.net>`,
-    to: recipient,
-    subject: subject,
+  const body = {
+    from: {
+      email: "no-reply@test-r83ql3pmr3mgzw1j.mlsender.net",
+      name: "RestaurantDemo",
+    },
+    to: [
+      {
+        email: recipient,
+      },
+    ],
+    subject,
     text: message,
     html: html || `<p>${message}</p>`,
+  };
+
+  const res = await fetch("https://api.mailersend.com/v1/email", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiToken}`,
+    },
+    body: JSON.stringify(body),
   });
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.error("MailerSend API error:", errorText);
+    throw new Error("Failed to send email");
+  }
+
+  console.log(`Email sent to ${recipient}`);
 }
