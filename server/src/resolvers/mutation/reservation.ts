@@ -107,31 +107,35 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
 
     if (!newReservation) throw new GraphQLError("Failed to create reservation");
 
-    await sendEmail(
-      email,
-      "Your Table Booking is Confirmed!",
-      confirmationMessage({
-        firstName,
-        lastName,
-        confirmationCode: newReservation.confirmationCode,
-        arrival: sittingStartDate.toLocaleString(),
-        partySize,
-        restaurantName: restaurant.name,
-      }),
-      getTemplate(EmailTemplate.CONFIRMATION, {
-        firstName,
-        lastName,
-        confirmationCode: newReservation.confirmationCode,
-        arrival: sittingStartDate.toLocaleString(),
-        partySize,
-        restaurantName: restaurant.name,
-      })
-    ).catch(async () => {
+    try {
+      await sendEmail(
+        email,
+        "Your Table Booking is Confirmed!",
+        confirmationMessage({
+          firstName,
+          lastName,
+          confirmationCode: newReservation.confirmationCode,
+          arrival: sittingStartDate.toLocaleString(),
+          partySize,
+          restaurantName: restaurant.name,
+        }),
+        getTemplate(EmailTemplate.CONFIRMATION, {
+          firstName,
+          lastName,
+          confirmationCode: newReservation.confirmationCode,
+          arrival: sittingStartDate.toLocaleString(),
+          partySize,
+          restaurantName: restaurant.name,
+        })
+      )
+    }
+    catch (err) {
+      console.error("Email sending failed:", err);
       await reservations.deleteOne({ _id: newReservation._id });
       throw new GraphQLError(
         "Failed to confirm reservation via email, please contact the restaurant directly or try again later."
       );
-    });
+    }
 
     return newReservation;
   },
@@ -278,30 +282,34 @@ export const reservationMutationResolvers: MutationResolvers<GraphQLContext> = {
     );
 
     if (!updatedReservation) throw new GraphQLError("Failed to update reservation");
-    await sendEmail(
-      updatedReservation.email,
-      "Your Table Reservation Has Been Updated!",
-      confirmationMessage({
-        firstName: updatedReservation.firstName,
-        lastName: updatedReservation.lastName,
-        confirmationCode: updatedReservation.confirmationCode,
-        arrival: updatedReservation.sittingStart.toLocaleString(),
-        partySize: updatedReservation.partySize,
-        restaurantName: restaurant.name,
-      }),
-      getTemplate(EmailTemplate.CONFIRMATION, {
-        firstName: updatedReservation.firstName,
-        lastName: updatedReservation.lastName,
-        confirmationCode: updatedReservation.confirmationCode,
-        arrival: updatedReservation.sittingStart.toLocaleString(),
-        partySize: updatedReservation.partySize,
-        restaurantName: restaurant.name,
-      })
-    ).catch(() => {
+    try {
+      await sendEmail(
+        updatedReservation.email,
+        "Your Table Reservation Has Been Updated!",
+        confirmationMessage({
+          firstName: updatedReservation.firstName,
+          lastName: updatedReservation.lastName,
+          confirmationCode: updatedReservation.confirmationCode,
+          arrival: updatedReservation.sittingStart.toLocaleString(),
+          partySize: updatedReservation.partySize,
+          restaurantName: restaurant.name,
+        }),
+        getTemplate(EmailTemplate.CONFIRMATION, {
+          firstName: updatedReservation.firstName,
+          lastName: updatedReservation.lastName,
+          confirmationCode: updatedReservation.confirmationCode,
+          arrival: updatedReservation.sittingStart.toLocaleString(),
+          partySize: updatedReservation.partySize,
+          restaurantName: restaurant.name,
+        })
+      )
+    } catch (err) {
+      console.error("Email sending failed:", err)
       throw new GraphQLError(
         "Failed to send update confirmation via email, please contact the customer directly instead."
       );
-    });
+    }
+
 
     return updatedReservation;
   },
