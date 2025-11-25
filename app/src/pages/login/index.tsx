@@ -19,8 +19,10 @@ const LoginPage = () => {
 
 
   const [signInMutation] = useMutation<SignInMutation, SignInMutationVariables>(SIGN_IN_MUTATION, {
-    onCompleted: () => {
-      login();
+    onCompleted: (data) => {
+      if (data.signIn) {
+        login(data.signIn)
+      }
     },
     onError: (errors) => {
       setServerError(errors.message);
