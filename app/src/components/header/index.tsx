@@ -57,7 +57,7 @@ export function Header() {
           color="inherit"
           pl={1}
         >
-          <Typography variant="h6">Restaurant-Booking-Demo</Typography>
+          <Typography variant="h6">Restaurant Booking Demo</Typography>
         </MuiLink>
 
         <Box flexGrow={1} />
