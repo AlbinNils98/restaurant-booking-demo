@@ -5,21 +5,13 @@ export function getCurrentUser(token?: string): { _id: string; role: string } | 
   if (!token) return null;
 
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET!) as {
-      userId: string;
+    const payload = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET!) as {
+      _id: string;
       role: string;
     };
 
-    return { _id: payload.userId, role: payload.role };
-  } catch (err) {
-    if (err instanceof TokenExpiredError) {
-      throw new GraphQLError("JWT expired");
-    } else if (err instanceof JsonWebTokenError) {
-      throw new GraphQLError("Invalid JWT");
-    } else if (err instanceof NotBeforeError) {
-      throw new GraphQLError("JWT not active yet");
-    } else {
-      throw new GraphQLError("Unexpected JWT error");
-    }
+    return { _id: payload._id, role: payload.role };
+  } catch {
+    return null
   }
 }

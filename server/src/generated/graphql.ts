@@ -50,11 +50,12 @@ export type Mutation = {
   addRestaurant: Restaurant;
   addTable: Table;
   addUser: User;
+  refresh: Scalars['String']['output'];
   removeMenuItem: Scalars['Boolean']['output'];
   removeReservation: Scalars['Boolean']['output'];
   removeTable: Table;
   sendContactEmail: Scalars['Boolean']['output'];
-  signIn: AuthRes;
+  signIn: Scalars['String']['output'];
   signOut: AuthRes;
   undoTableRemoval: Table;
   updateMenuItem: MenuItem;
@@ -566,11 +567,12 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addRestaurant?: Resolver<ResolversTypes['Restaurant'], ParentType, ContextType, RequireFields<MutationAddRestaurantArgs, 'adress' | 'name' | 'openingDays' | 'openingHours' | 'sittings'>>;
   addTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationAddTableArgs, 'name' | 'restaurantId' | 'seats'>>;
   addUser?: Resolver<ResolversTypes['User'], ParentType, ContextType, RequireFields<MutationAddUserArgs, 'email' | 'name' | 'password'>>;
+  refresh?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   removeMenuItem?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveMenuItemArgs, 'itemId' | 'restaurantId'>>;
   removeReservation?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationRemoveReservationArgs, 'reservationId'>>;
   removeTable?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationRemoveTableArgs, 'tableId'>>;
   sendContactEmail?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationSendContactEmailArgs, 'email' | 'message' | 'name'>>;
-  signIn?: Resolver<ResolversTypes['authRes'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
+  signIn?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationSignInArgs, 'email' | 'password'>>;
   signOut?: Resolver<ResolversTypes['authRes'], ParentType, ContextType>;
   undoTableRemoval?: Resolver<ResolversTypes['Table'], ParentType, ContextType, RequireFields<MutationUndoTableRemovalArgs, 'tableId'>>;
   updateMenuItem?: Resolver<ResolversTypes['MenuItem'], ParentType, ContextType, RequireFields<MutationUpdateMenuItemArgs, 'itemId' | 'restaurantId'>>;

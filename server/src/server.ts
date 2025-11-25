@@ -84,8 +84,9 @@ export async function initServer() {
       methods: ["GET", "POST", "OPTIONS"],
       allowedHeaders: ["Content-Type", "Authorization"]
     },
-    context: async ({ request, req, res }): Promise<GraphQLContext> => {
-      const token = req.cookies?.access_token;
+    context: async ({ req, res }): Promise<GraphQLContext> => {
+      const authHeader = req.headers.authorization || "";
+      const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
       const currentUser = getCurrentUser(token);
 
       return {

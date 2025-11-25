@@ -1,5 +1,6 @@
 type Mutation {
-  signIn(email: String!, password: String!): authRes! @public
+  signIn(email: String!, password: String!): String! @public
+  refresh: String! @public
   signOut: authRes! @public
 }
 
