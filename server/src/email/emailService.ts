@@ -7,11 +7,12 @@ export async function sendEmail(
   html?: string
 ) {
   const apiToken = process.env.MAILERSEND_API_TOKEN!;
+  const emailDomain = process.env.MAILERSEND_EMAIL_DOMAIN!;
 
   const body = {
     from: {
-      email: "no-reply@test-r83ql3pmr3mgzw1j.mlsender.net",
-      name: "RestaurantDemo",
+      email: `no-reply@${emailDomain}`,
+      name: "Restaurant Demo",
     },
     to: [
       {
@@ -37,6 +38,4 @@ export async function sendEmail(
     console.error("MailerSend API error:", errorText);
     throw new Error("Failed to send email");
   }
-
-  console.log(`Email sent to ${recipient}`);
 }
