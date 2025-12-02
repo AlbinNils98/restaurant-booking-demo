@@ -15,24 +15,26 @@ export const contactMutationResolvers: MutationResolvers<GraphQLContext> = {
 
     const supportEmail = process.env.SUPPORT_EMAIL ?? '';
 
-    await sendEmail(
-      supportEmail,
-      "New contact message",
-      confirmationMessage({
-        name,
-        email,
-        message
-      }),
-      getTemplate(EmailTemplate.CONTACT, {
-        name,
-        email,
-        message,
-      })
-    ).catch(() => {
+    try {
+      await sendEmail(
+        supportEmail,
+        "New contact message",
+        confirmationMessage({
+          name,
+          email,
+          message
+        }),
+        getTemplate(EmailTemplate.CONTACT, {
+          name,
+          email,
+          message,
+        }))
+    } catch (err) {
       throw new GraphQLError(
         "Failed to send email. Try again later or call the restaurant directly."
       );
-    });
+    }
+
     return true;
   },
 }
